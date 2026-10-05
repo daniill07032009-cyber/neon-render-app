@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+
+# Локальная база (у нас Neon)
+library.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Секреты
+.env
+.env.local
+
+# Загруженные файлы: исключаем содержимое, но сохраняем саму папку
+uploads/*
+!uploads/.gitkeep
+
+# IDE и ОС
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

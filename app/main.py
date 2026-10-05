@@ -1,8 +1,10 @@
 from pathlib import Path
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, Query
+from datetime import datetime
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -19,6 +21,35 @@ import app.models  # noqa
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.APP_NAME)
+
+
+# ---------- Middleware: обновляем last_seen при каждом запросе ----------
+class LastSeenMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        try:
+            token = request.cookies.get(settings.SESSION_COOKIE_NAME)
+            if token:
+                from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+                serializer = URLSafeTimedSerializer(settings.SECRET_KEY, salt="sl-session")
+                data = serializer.loads(token, max_age=settings.SESSION_MAX_AGE)
+                uid = data.get("uid")
+                if uid:
+                    db = SessionLocal()
+                    try:
+                        user = db.get(User, uid)
+                        if user:
+                            user.last_seen = datetime.utcnow()
+                            db.commit()
+                    finally:
+                        db.close()
+        except Exception:
+            pass
+        return response
+
+
+app.add_middleware(LastSeenMiddleware)
+
 
 # CORS для дев-режима
 if settings.ENV == "development":
@@ -51,7 +82,6 @@ def health():
 async def ws_chat(websocket: WebSocket, chat_id: str):
     db: Session = SessionLocal()
     try:
-        # Получаем пользователя из cookie
         user = get_current_user_optional_ws(websocket, db)
         if not user:
             await websocket.close(code=4401)

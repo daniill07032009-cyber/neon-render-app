@@ -1,0 +1,4414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Северная Библиотека — читай, публикуй, общайся</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Oswald:wght@300;400;500;600&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Uncial+Antiqua&display=swap" rel="stylesheet">
+<style>
+:root{
+    --bg:#0a0e14; --bg2:#10161f; --panel:#151c27; --card:#1a2230; --hover:#212c3d;
+    --text:#d6e0ec; --text2:#8a9bb0; --text3:#5a6a7d;
+    --accent:#7fb3d5; --accent2:#4a7a9b; --glow:rgba(127,179,213,0.25);
+    --border:#2a3545; --shadow:rgba(0,0,0,0.5);
+    --font-body:'PT Serif',Georgia,serif;
+    --font-head:'Oswald',sans-serif;
+    --font-display:'Uncial Antiqua',serif;
+    --font-title:'Cormorant Garamond',serif;
+    --fs:17px;
+    --msg-out:#1e3a52; --msg-in:#1a2230;
+    --danger:#c94a4a; --success:#5da86a; --warning:#d9a83c;
+    --online:#5da86a;
+}
+body.light{
+    --bg:#f4ecd8; --bg2:#ede3cc; --panel:#f8f2e2; --card:#ffffff; --hover:#eee3c8;
+    --text:#2c2218; --text2:#5a4a35; --text3:#8a7a60;
+    --accent:#8b5a2b; --accent2:#6a4420; --glow:rgba(139,90,43,0.2);
+    --border:#d4c5a0; --shadow:rgba(60,40,20,0.15);
+    --msg-out:#f0d9a8; --msg-in:#ffffff;
+}
+body.night{
+    --bg:#05070a; --bg2:#0a0e14; --panel:#0f141c; --card:#131a24; --hover:#1a2330;
+    --text:#b8c6d8; --text2:#6a7a8d; --text3:#3e4a5a;
+    --accent:#5a8ab0; --accent2:#3a5f7a; --glow:rgba(90,138,176,0.2);
+    --border:#1c2530; --shadow:rgba(0,0,0,0.7);
+    --msg-out:#1a3a52; --msg-in:#131a24;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+    background:var(--bg); color:var(--text); font-family:var(--font-body);
+    font-size:var(--fs); line-height:1.7; min-height:100vh;
+    transition:background .4s,color .4s;
+}
+body::before{
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+        radial-gradient(ellipse at 20% 0%, var(--glow) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 100%, var(--glow) 0%, transparent 55%);
+    opacity:.6;
+}
+button{font-family:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit}
+.container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* КНОПКИ */
+.btn{
+    display:inline-flex; align-items:center; gap:8px; justify-content:center;
+    padding:10px 22px; border-radius:8px; font-family:var(--font-head);
+    font-size:.85rem; letter-spacing:1.5px; text-transform:uppercase;
+    border:1px solid var(--accent); background:transparent; color:var(--accent);
+    transition:all .25s; cursor:pointer;
+}
+.btn:hover{background:var(--accent); color:var(--bg); transform:translateY(-2px); box-shadow:0 8px 20px var(--glow)}
+.btn-primary{background:var(--accent); color:var(--bg)}
+.btn-primary:hover{background:var(--accent2); color:var(--text)}
+.btn-ghost{border-color:var(--border); color:var(--text2)}
+.btn-ghost:hover{background:var(--hover); color:var(--accent); border-color:var(--accent)}
+.btn-danger{border-color:var(--danger); color:var(--danger)}
+.btn-danger:hover{background:var(--danger); color:#fff; box-shadow:0 8px 20px rgba(201,74,74,.3)}
+.btn-success{border-color:var(--success); color:var(--success)}
+.btn-success:hover{background:var(--success); color:#fff}
+.btn-sm{padding:6px 14px; font-size:.72rem}
+.btn-block{width:100%; justify-content:center}
+.btn:disabled{opacity:.4; cursor:not-allowed; transform:none; box-shadow:none}
+.btn-google{background:#fff; color:#333; border-color:#ddd; font-weight:600}
+.btn-google:hover{background:#f5f5f5; color:#333; border-color:#bbb; box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.btn-google svg{width:18px; height:18px}
+
+.card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:24px; transition:all .3s}
+
+/* ШАПКА */
+.topbar{
+    position:sticky; top:0; z-index:100;
+    background:var(--panel); border-bottom:1px solid var(--border);
+    box-shadow:0 4px 24px var(--shadow); transition:background .4s;
+}
+.topbar-inner{
+    max-width:1500px; margin:0 auto; padding:0 20px;
+    height:64px; display:flex; align-items:center; gap:14px;
+}
+.brand{display:flex; align-items:center; gap:10px; cursor:pointer; flex-shrink:0}
+.brand-sigil{
+    width:38px; height:38px; border:2px solid var(--accent); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:18px; color:var(--accent);
+    background:var(--card); box-shadow:0 0 14px var(--glow);
+}
+.brand-name{
+    font-family:var(--font-head); font-size:.95rem; letter-spacing:2px;
+    text-transform:uppercase; color:var(--text);
+}
+.brand-name small{display:block; font-size:.62rem; color:var(--text3); letter-spacing:3px; font-weight:300}
+.brand-counter{
+    font-family:var(--font-head); font-size:.68rem; color:var(--accent);
+    letter-spacing:1.5px; padding:4px 9px; border:1px solid var(--border);
+    border-radius:6px; background:var(--card);
+}
+
+/* ГЛОБАЛЬНЫЙ ПОИСК */
+.global-search{
+    flex:1; max-width:340px; position:relative;
+}
+.global-search input{
+    width:100%; padding:9px 14px 9px 36px;
+    background:var(--card); color:var(--text);
+    border:1px solid var(--border); border-radius:8px;
+    font-size:.88rem; outline:none; transition:all .2s;
+}
+.global-search input:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow)}
+.global-search .search-icon{
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:var(--text3); font-size:14px; pointer-events:none;
+}
+.global-search-results{
+    position:absolute; top:100%; left:0; right:0; margin-top:6px;
+    background:var(--panel); border:1px solid var(--accent); border-radius:10px;
+    max-height:340px; overflow-y:auto; z-index:200;
+    box-shadow:0 12px 40px rgba(0,0,0,.6); display:none;
+}
+.global-search-results.active{display:block}
+.search-result{
+    padding:10px 14px; cursor:pointer; display:flex; align-items:center; gap:10px;
+    transition:all .2s; border-bottom:1px solid var(--border);
+}
+.search-result:last-child{border-bottom:none}
+.search-result:hover{background:var(--hover)}
+.search-result-type{
+    font-family:var(--font-head); font-size:.62rem; color:var(--text3);
+    letter-spacing:1.5px; text-transform:uppercase; margin-left:auto;
+}
+
+.nav-links{display:flex; gap:4px; overflow-x:auto; flex-shrink:0}
+.nav-link{
+    padding:8px 12px; border-radius:8px; background:none; border:none;
+    font-family:var(--font-head); font-size:.75rem; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--text2); transition:all .2s;
+    white-space:nowrap; cursor:pointer;
+}
+.nav-link:hover{color:var(--accent); background:var(--hover)}
+.nav-link.active{color:var(--accent); background:var(--hover)}
+.nav-link .badge{
+    display:inline-block; background:#c94a4a; color:#fff; font-size:.62rem;
+    border-radius:10px; padding:1px 5px; margin-left:5px; font-family:var(--font-head);
+    letter-spacing:0;
+}
+.topbar-actions{display:flex; align-items:center; gap:8px; margin-left:auto; flex-shrink:0}
+
+.icon-btn{
+    width:38px; height:38px; border:1px solid var(--border); background:var(--card);
+    color:var(--text2); border-radius:8px; font-size:16px;
+    display:flex; align-items:center; justify-content:center; transition:all .2s; cursor:pointer;
+    position:relative;
+}
+.icon-btn:hover{color:var(--accent); border-color:var(--accent); background:var(--hover)}
+.icon-btn svg{
+    width:18px; height:18px; display:block;
+    color:var(--text2);
+    transition:color .2s;
+    pointer-events:none;
+}
+.icon-btn:hover svg{color:var(--accent)}
+.icon-btn .online-dot{
+    position:absolute; top:-3px; right:-3px; min-width:18px; height:18px;
+    background:var(--online); color:#fff; border-radius:9px; font-size:.62rem;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-head); font-weight:600; padding:0 4px;
+    border:2px solid var(--panel); box-shadow:0 0 8px rgba(93,168,106,.5);
+}
+.icon-btn .friend-dot{
+    position:absolute; top:-3px; right:-3px; min-width:18px; height:18px;
+    background:#c94a4a; color:#fff; border-radius:9px; font-size:.62rem;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-head); font-weight:600; padding:0 4px;
+    border:2px solid var(--panel);
+}
+
+.user-chip{
+    display:flex; align-items:center; gap:8px;
+    padding:5px 10px 5px 5px; border:1px solid var(--border); background:var(--card);
+    border-radius:20px; font-family:var(--font-head); font-size:.78rem;
+    color:var(--accent); letter-spacing:1px; transition:all .2s; cursor:pointer;
+}
+.user-chip:hover{border-color:var(--accent); background:var(--hover)}
+
+/* АВАТАР */
+.avatar{
+    border-radius:50%; background:var(--accent); color:var(--bg);
+    display:flex; align-items:center; justify-content:center; font-weight:600;
+    flex-shrink:0; position:relative; overflow:hidden;
+    font-family:var(--font-head); letter-spacing:0;
+}
+.avatar img{width:100%; height:100%; object-fit:cover; display:block}
+.avatar.size-sm{width:28px; height:28px; font-size:12px}
+.avatar.size-md{width:40px; height:40px; font-size:16px}
+.avatar.size-lg{width:80px; height:80px; font-size:32px}
+.avatar.size-xl{width:120px; height:120px; font-size:48px}
+.avatar.google{background:#4285F4; color:#fff}
+.avatar .status-dot{
+    position:absolute; bottom:2px; right:2px;
+    width:22%; height:22%; min-width:8px; min-height:8px; border-radius:50%;
+    background:var(--text3); border:2px solid var(--panel); box-sizing:content-box;
+}
+.avatar .status-dot.online{background:var(--online); box-shadow:0 0 6px var(--online)}
+
+/* ПАНЕЛИ */
+.side-panel{
+    position:fixed; top:64px; right:0; bottom:0;
+    width:380px; max-width:92vw;
+    background:var(--panel);
+    border-left:1px solid var(--border);
+    z-index:150;
+    transform:translateX(100%);
+    transition:transform .35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:-12px 0 40px var(--shadow);
+    display:flex; flex-direction:column;
+}
+.side-panel.open{transform:translateX(0)}
+
+.side-panel-head{
+    padding:18px 22px 14px;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+}
+.side-panel-head .title{
+    font-family:var(--font-head); font-size:.95rem;
+    letter-spacing:2.5px; text-transform:uppercase; color:var(--accent);
+}
+.side-panel-head .counter{
+    font-family:var(--font-head); font-size:.72rem;
+    color:var(--text3); letter-spacing:1px; margin-top:2px;
+}
+.side-panel-head .counter .online-num{color:var(--online); font-weight:600}
+
+.side-panel-search{
+    padding:10px 22px;
+    border-bottom:1px solid var(--border);
+}
+.side-panel-search input{
+    width:100%; padding:10px 14px;
+    background:var(--card); color:var(--text);
+    border:1px solid var(--border); border-radius:8px;
+    font-size:.9rem; outline:none;
+}
+.side-panel-search input:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow)}
+
+.side-panel-tabs{
+    display:flex; border-bottom:1px solid var(--border);
+}
+.side-panel-tab{
+    flex:1; padding:11px 6px; background:none; border:none;
+    font-family:var(--font-head); font-size:.72rem; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--text3); cursor:pointer;
+    border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .2s;
+    position:relative;
+}
+.side-panel-tab.active{color:var(--accent); border-bottom-color:var(--accent)}
+.side-panel-tab .tab-badge{
+    display:inline-block; background:#c94a4a; color:#fff; font-size:.6rem;
+    border-radius:8px; padding:0 5px; margin-left:4px; letter-spacing:0;
+}
+
+.side-panel-body{
+    flex:1; overflow-y:auto; padding:10px;
+}
+.side-panel-body::-webkit-scrollbar{width:6px}
+.side-panel-body::-webkit-scrollbar-thumb{background:var(--border); border-radius:3px}
+
+.users-section-label{
+    font-family:var(--font-head); font-size:.66rem;
+    letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--text3); padding:12px 12px 6px;
+}
+.users-section-label.online-label{color:var(--online)}
+
+.user-card{
+    display:flex; gap:12px; align-items:center;
+    padding:10px 12px; border-radius:10px;
+    transition:all .2s; cursor:pointer;
+    border:1px solid transparent;
+    margin-bottom:2px;
+}
+.user-card:hover{background:var(--hover); border-color:var(--border)}
+.user-card-info{flex:1; min-width:0}
+.user-card-name{
+    font-family:var(--font-head); font-size:.88rem;
+    color:var(--text); letter-spacing:.5px;
+    display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+}
+.user-card-username{
+    font-size:.75rem; color:var(--accent); font-family:var(--font-head);
+    letter-spacing:.5px;
+}
+.user-card-status{
+    font-size:.75rem; color:var(--text3);
+    font-style:italic; margin-top:2px;
+}
+.user-card-status.online{color:var(--online); font-style:normal; font-family:var(--font-head); letter-spacing:.5px}
+.user-card-actions{flex-shrink:0; display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end}
+.user-card-write{
+    padding:5px 11px; font-size:.68rem; letter-spacing:1px;
+    background:transparent; border:1px solid var(--border);
+    color:var(--text2); border-radius:6px;
+    font-family:var(--font-head); text-transform:uppercase;
+    cursor:pointer; transition:all .2s;
+}
+.user-card-write:hover{background:var(--accent); color:var(--bg); border-color:var(--accent)}
+.user-card-write.primary{background:var(--accent); color:var(--bg); border-color:var(--accent)}
+.user-card-write.danger{border-color:var(--danger); color:var(--danger)}
+.user-card-write.danger:hover{background:var(--danger); color:#fff}
+.user-card-write.success{border-color:var(--success); color:var(--success)}
+.user-card-write.success:hover{background:var(--success); color:#fff}
+
+.side-panel-empty{
+    padding:40px 20px; text-align:center;
+    color:var(--text3); font-size:.85rem; font-style:italic;
+}
+
+.side-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.5);
+    z-index:140; opacity:0; pointer-events:none;
+    transition:opacity .3s;
+}
+.side-backdrop.active{opacity:1; pointer-events:auto}
+
+/* ПРОФИЛЬ */
+.profile-page{padding:40px 0}
+.profile-card{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:16px; overflow:hidden; margin-bottom:24px;
+}
+.profile-banner{
+    height:180px;
+    background:linear-gradient(135deg,var(--accent2),var(--accent));
+    position:relative;
+}
+.profile-banner::after{
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse at 30% 20%, rgba(255,255,255,.15), transparent 60%),
+               radial-gradient(ellipse at 80% 90%, rgba(0,0,0,.3), transparent 60%);
+}
+.profile-main{
+    padding:0 32px 32px;
+    margin-top:-60px;
+    position:relative;
+}
+.profile-avatar-wrap{
+    display:flex; align-items:flex-end; gap:20px; margin-bottom:20px; flex-wrap:wrap;
+}
+.profile-avatar{
+    width:130px; height:130px; border-radius:50%;
+    border:5px solid var(--panel); background:var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:48px; color:var(--bg);
+    overflow:hidden; position:relative; box-shadow:0 8px 24px var(--shadow);
+    flex-shrink:0;
+}
+.profile-avatar img{width:100%; height:100%; object-fit:cover; display:block}
+.profile-avatar .status-dot{
+    position:absolute; bottom:8px; right:8px;
+    width:20px; height:20px; border-radius:50%;
+    background:var(--online); border:3px solid var(--panel);
+}
+.profile-avatar .status-dot.off{background:var(--text3)}
+
+.profile-actions{margin-left:auto; display:flex; gap:8px; flex-wrap:wrap}
+.profile-name{
+    font-family:var(--font-title); font-size:2rem;
+    color:var(--text); font-weight:600; margin-bottom:4px;
+}
+.profile-username{
+    font-family:var(--font-head); font-size:.95rem;
+    color:var(--accent); letter-spacing:.5px; margin-bottom:12px;
+}
+.profile-status{
+    font-size:.85rem; color:var(--text3); font-family:var(--font-head);
+    letter-spacing:1px; margin-bottom:14px;
+}
+.profile-status.online{color:var(--online)}
+.profile-bio{
+    font-size:1rem; line-height:1.7; color:var(--text2);
+    max-width:640px; margin-bottom:20px; white-space:pre-wrap;
+}
+.profile-stats{
+    display:flex; gap:32px; flex-wrap:wrap;
+    padding-top:20px; border-top:1px solid var(--border);
+}
+.profile-stat{text-align:left}
+.profile-stat-num{
+    font-family:var(--font-display); font-size:1.6rem;
+    color:var(--accent);
+}
+.profile-stat-label{
+    font-family:var(--font-head); font-size:.7rem;
+    letter-spacing:2px; text-transform:uppercase; color:var(--text3);
+    margin-top:2px;
+}
+
+.profile-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:16px;
+    margin-top:20px;
+}
+
+/* СООБЩЕСТВА */
+.communities-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:20px;
+}
+.community-card{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:12px; padding:22px;
+    transition:all .25s; cursor:pointer;
+    display:flex; flex-direction:column; gap:12px;
+}
+.community-card:hover{
+    border-color:var(--accent);
+    transform:translateY(-3px);
+    box-shadow:0 16px 30px var(--shadow), 0 0 20px var(--glow);
+}
+.community-head{display:flex; gap:14px; align-items:center}
+.community-avatar{
+    width:56px; height:56px; border-radius:14px;
+    background:linear-gradient(135deg,var(--accent2),var(--accent));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:24px; color:var(--bg);
+    overflow:hidden; flex-shrink:0;
+}
+.community-avatar img{width:100%; height:100%; object-fit:cover; display:block}
+.community-title{
+    font-family:var(--font-head); font-size:1.05rem;
+    color:var(--text); letter-spacing:1px; line-height:1.2;
+    margin-bottom:4px;
+}
+.community-meta{
+    font-size:.78rem; color:var(--text3); font-family:var(--font-head);
+    letter-spacing:.5px;
+}
+.community-desc{
+    font-size:.9rem; color:var(--text2); line-height:1.5;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+.community-footer{
+    display:flex; gap:8px; align-items:center;
+    padding-top:12px; border-top:1px solid var(--border);
+    margin-top:auto;
+}
+.community-member-badge{
+    font-family:var(--font-head); font-size:.72rem;
+    letter-spacing:1px; color:var(--text3);
+    padding:3px 8px; border:1px solid var(--border); border-radius:6px;
+}
+
+.community-page{padding:40px 0}
+.community-page-head{
+    display:flex; gap:24px; align-items:flex-start;
+    margin-bottom:28px; flex-wrap:wrap;
+}
+.community-page-avatar{
+    width:120px; height:120px; border-radius:20px;
+    background:linear-gradient(135deg,var(--accent2),var(--accent));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:52px; color:var(--bg);
+    overflow:hidden; flex-shrink:0;
+    box-shadow:0 12px 30px var(--shadow);
+}
+.community-page-avatar img{width:100%; height:100%; object-fit:cover; display:block}
+.community-page-info{flex:1; min-width:0}
+.community-page-title{
+    font-family:var(--font-title); font-size:2rem;
+    color:var(--text); margin-bottom:6px;
+}
+.community-page-username{
+    font-family:var(--font-head); font-size:.9rem;
+    color:var(--accent); letter-spacing:.5px; margin-bottom:12px;
+}
+.community-page-desc{
+    font-size:1rem; line-height:1.7; color:var(--text2);
+    margin-bottom:18px; white-space:pre-wrap;
+}
+.community-tabs{
+    display:flex; gap:6px; border-bottom:1px solid var(--border);
+    margin-bottom:20px;
+}
+.community-tab{
+    padding:12px 18px; background:none; border:none;
+    font-family:var(--font-head); font-size:.78rem;
+    letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--text3); cursor:pointer;
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+    transition:all .2s;
+}
+.community-tab.active{color:var(--accent); border-bottom-color:var(--accent)}
+
+/* ГЛАВНАЯ */
+.hero{padding:80px 0 60px; text-align:center}
+.hero h1{
+    font-family:var(--font-display); font-size:3.6rem; line-height:1.1;
+    color:var(--text); letter-spacing:2px; margin-bottom:20px;
+}
+.hero .subtitle{
+    font-family:var(--font-title); font-style:italic; font-size:1.4rem;
+    color:var(--accent); margin-bottom:28px;
+}
+.hero p{max-width:640px; margin:0 auto 32px; color:var(--text2); font-size:1.05rem}
+
+.section{padding:40px 0}
+.section-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:24px; padding-bottom:12px; border-bottom:1px solid var(--border); gap:16px; flex-wrap:wrap;
+}
+.section-title{
+    font-family:var(--font-head); font-size:1.1rem; letter-spacing:3px;
+    text-transform:uppercase; color:var(--accent);
+}
+
+/* КАТАЛОГ */
+.books-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:24px;
+}
+.book-card{
+    cursor:pointer; transition:all .3s; text-align:left;
+    background:transparent; border:none; padding:0; position:relative;
+}
+.book-card:hover .book-cover{transform:translateY(-4px); box-shadow:0 16px 30px var(--shadow), 0 0 30px var(--glow)}
+.book-cover{
+    aspect-ratio:2/3; border-radius:6px; position:relative; overflow:hidden;
+    border:1px solid var(--border); margin-bottom:12px; transition:all .3s;
+    background:linear-gradient(135deg,var(--panel),var(--card));
+    display:flex; align-items:center; justify-content:center;
+}
+.book-cover img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    position:absolute; inset:0;
+}
+.book-cover-symbol{
+    font-family:var(--font-display); font-size:52px; color:var(--accent);
+    text-shadow:0 0 30px var(--glow); opacity:.85;
+}
+.book-cover::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,.5), transparent 40%);
+    pointer-events:none;
+}
+.book-title{
+    font-family:var(--font-title); font-size:1.05rem; font-weight:600;
+    color:var(--text); line-height:1.3; margin-bottom:4px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.book-author{font-size:.82rem; color:var(--text2); margin-bottom:2px}
+.book-meta{font-size:.75rem; color:var(--text3); font-style:italic}
+
+/* Значок "Читаю" на обложке */
+.book-reading-badge{
+    position:absolute; top:8px; left:8px; z-index:3;
+    background:var(--accent); color:var(--bg);
+    font-family:var(--font-head); font-size:.6rem; letter-spacing:1px;
+    text-transform:uppercase; padding:3px 7px; border-radius:5px;
+    box-shadow:0 4px 12px var(--glow); font-weight:600;
+}
+/* Прогресс-бар под карточкой */
+.book-progress{
+    margin-top:8px; height:4px; background:var(--border);
+    border-radius:2px; overflow:hidden;
+}
+.book-progress-fill{
+    height:100%; background:var(--accent);
+    border-radius:2px; transition:width .4s;
+}
+
+.empty{
+    padding:60px 20px; text-align:center; color:var(--text3);
+    font-family:var(--font-head); letter-spacing:2px; text-transform:uppercase;
+    font-size:.85rem; border:1px dashed var(--border); border-radius:12px;
+}
+
+/* СТРАНИЦА КНИГИ */
+.book-page{padding:40px 0}
+.book-layout{display:grid; grid-template-columns:280px 1fr; gap:40px}
+.book-cover-large{
+    aspect-ratio:2/3; border-radius:10px; border:1px solid var(--border);
+    background:linear-gradient(135deg,var(--panel),var(--card));
+    display:flex; align-items:center; justify-content:center; margin-bottom:20px;
+    box-shadow:0 20px 40px var(--shadow);
+    position:relative; overflow:hidden;
+}
+.book-cover-large img{width:100%; height:100%; object-fit:cover; display:block; position:absolute; inset:0}
+.book-cover-large .book-cover-symbol{font-size:96px}
+.book-info h1{font-family:var(--font-title); font-size:2.4rem; line-height:1.2; color:var(--text); margin-bottom:12px}
+.book-info .author{font-size:1.1rem; color:var(--accent); margin-bottom:8px; font-style:italic}
+.book-info .meta-line{
+    display:flex; gap:16px; flex-wrap:wrap; font-size:.85rem;
+    color:var(--text3); margin-bottom:24px; font-family:var(--font-head);
+    letter-spacing:1px; text-transform:uppercase;
+}
+.book-annotation{
+    font-size:1.05rem; line-height:1.7; color:var(--text2);
+    margin-bottom:28px; padding-bottom:24px; border-bottom:1px solid var(--border);
+    white-space:pre-wrap;
+}
+.chapters-preview{margin-top:28px}
+.chapter-preview-item{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; border-radius:8px; border:1px solid var(--border);
+    margin-bottom:8px; background:var(--card); transition:all .2s; cursor:pointer;
+}
+.chapter-preview-item:hover{border-color:var(--accent); background:var(--hover); transform:translateX(4px)}
+.chapter-preview-item.current{border-color:var(--accent); background:var(--hover); box-shadow:0 0 0 2px var(--glow)}
+.chapter-preview-item .num{font-family:var(--font-head); font-size:.7rem; letter-spacing:2px; color:var(--accent); text-transform:uppercase}
+.chapter-preview-item .title{font-family:var(--font-title); font-size:1.05rem; margin-top:2px}
+.chapter-preview-item .arrow{color:var(--accent); font-size:1.2rem}
+.chapter-preview-item .current-mark{
+    font-family:var(--font-head); font-size:.62rem; letter-spacing:1px;
+    text-transform:uppercase; color:var(--accent); margin-right:8px;
+}
+
+/* ЧИТАЛКА */
+.reader-view{padding:40px 0}
+.reader-toolbar{
+    position:sticky; top:64px; z-index:50; margin-bottom:24px;
+    background:var(--panel); border:1px solid var(--border); border-radius:10px;
+    padding:12px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    box-shadow:0 4px 20px var(--shadow);
+}
+.reader-toolbar .current-chapter{
+    font-family:var(--font-head); font-size:.8rem; letter-spacing:2px;
+    text-transform:uppercase; color:var(--accent); flex:1;
+}
+.reader-content{max-width:760px; margin:0 auto}
+.reader-content h2{font-family:var(--font-display); font-size:2rem; line-height:1.25; color:var(--text); text-align:center; margin-bottom:8px}
+.reader-content .chapter-label{
+    text-align:center; font-family:var(--font-head); font-size:.75rem;
+    letter-spacing:5px; text-transform:uppercase; color:var(--accent);
+    margin-bottom:32px; padding-bottom:24px; border-bottom:1px solid var(--border); position:relative;
+}
+.reader-content .chapter-label::after{
+    content:'❦'; position:absolute; bottom:-13px; left:50%; transform:translateX(-50%);
+    background:var(--bg); padding:0 14px; font-size:20px; color:var(--accent);
+    text-shadow:0 0 12px var(--glow);
+}
+.reader-content p{margin-bottom:20px; text-align:justify; hyphens:auto}
+.reader-content p:first-of-type::first-letter{
+    font-family:var(--font-display); font-size:3.4em; float:left; line-height:.85;
+    padding:6px 12px 0 0; color:var(--accent); text-shadow:0 4px 12px var(--glow);
+}
+.reader-nav{display:flex; justify-content:space-between; align-items:center; margin-top:48px; padding-top:24px; border-top:1px solid var(--border); gap:16px}
+
+/* ЛИЧНЫЙ КАБИНЕТ */
+.dashboard{padding:40px 0}
+.dashboard-head{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; gap:16px; flex-wrap:wrap}
+.dashboard-head h1{font-family:var(--font-title); font-size:2rem; color:var(--text); margin-bottom:6px}
+.dashboard-head .subtitle{color:var(--text2); font-style:italic}
+.my-books{display:grid; gap:16px}
+.my-book-item{
+    display:flex; gap:20px; align-items:center; padding:20px;
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; transition:all .2s;
+}
+.my-book-item:hover{border-color:var(--accent); box-shadow:0 0 20px var(--glow)}
+.my-book-cover{
+    width:60px; height:90px; border-radius:6px; flex-shrink:0;
+    background:linear-gradient(135deg,var(--panel),var(--card));
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:28px; color:var(--accent);
+    overflow:hidden; position:relative;
+}
+.my-book-cover img{width:100%; height:100%; object-fit:cover; display:block; position:absolute; inset:0}
+.my-book-info{flex:1; min-width:0}
+.my-book-info .title{font-family:var(--font-title); font-size:1.15rem; color:var(--text); font-weight:600; margin-bottom:4px}
+.my-book-info .meta{font-size:.82rem; color:var(--text3)}
+.my-book-actions{display:flex; gap:8px; flex-wrap:wrap}
+
+/* СТРАНИЦА "МОЁ ЧТЕНИЕ" */
+.reading-list{display:grid; gap:16px}
+.reading-item{
+    display:flex; gap:20px; align-items:center; padding:20px;
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    transition:all .2s;
+}
+.reading-item:hover{border-color:var(--accent); box-shadow:0 0 20px var(--glow)}
+.reading-cover{
+    width:70px; height:105px; border-radius:6px; flex-shrink:0;
+    background:linear-gradient(135deg,var(--panel),var(--card));
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:32px; color:var(--accent);
+    overflow:hidden; position:relative;
+}
+.reading-cover img{width:100%; height:100%; object-fit:cover; display:block; position:absolute; inset:0}
+.reading-info{flex:1; min-width:0}
+.reading-info .title{
+    font-family:var(--font-title); font-size:1.2rem; color:var(--text);
+    font-weight:600; margin-bottom:4px;
+}
+.reading-info .author{font-size:.85rem; color:var(--text2); margin-bottom:8px; font-style:italic}
+.reading-info .chapter-now{
+    font-family:var(--font-head); font-size:.78rem; letter-spacing:1px;
+    color:var(--accent); margin-bottom:8px;
+}
+.reading-progress-bar{
+    height:6px; background:var(--border); border-radius:3px; overflow:hidden;
+    margin-bottom:6px; max-width:400px;
+}
+.reading-progress-bar > div{
+    height:100%; background:var(--accent); border-radius:3px; transition:width .4s;
+}
+.reading-progress-text{
+    font-family:var(--font-head); font-size:.7rem; color:var(--text3);
+    letter-spacing:1px;
+}
+.reading-actions{display:flex; flex-direction:column; gap:8px; flex-shrink:0}
+
+/* РЕДАКТОР КНИГИ */
+.editor{padding:40px 0; max-width:800px; margin:0 auto}
+.editor h1{font-family:var(--font-title); font-size:2rem; color:var(--text); margin-bottom:8px; text-align:center}
+.editor .sub{text-align:center; color:var(--text2); font-style:italic; margin-bottom:32px}
+.field{margin-bottom:20px}
+.field label{display:block; font-family:var(--font-head); font-size:.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--text3); margin-bottom:8px}
+.field label .req{color:var(--danger)}
+.field input,.field textarea,.field select{
+    width:100%; padding:12px 14px; background:var(--card); color:var(--text);
+    border:1px solid var(--border); border-radius:8px; font-size:.95rem; outline:none; transition:all .25s;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow)}
+.field textarea{min-height:100px; resize:vertical; line-height:1.6}
+.field .hint{font-size:.75rem; color:var(--text3); margin-top:4px; font-style:italic}
+
+/* Выбор обложки книги */
+.cover-uploader{
+    display:flex; gap:20px; align-items:flex-start;
+    padding:20px; background:var(--card); border:1px dashed var(--border);
+    border-radius:12px; margin-bottom:16px;
+}
+.cover-preview-box{
+    width:140px; height:210px; border-radius:8px; flex-shrink:0;
+    background:linear-gradient(135deg,var(--panel),var(--card));
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+    overflow:hidden; position:relative;
+}
+.cover-preview-box img{width:100%; height:100%; object-fit:cover; display:block; position:absolute; inset:0}
+.cover-preview-box .book-cover-symbol{font-size:56px}
+.cover-uploader-info{flex:1; min-width:0}
+.cover-uploader-info p{font-size:.85rem; color:var(--text3); margin-bottom:10px; font-style:italic; line-height:1.5}
+.cover-uploader-actions{display:flex; gap:8px; flex-wrap:wrap}
+
+.chapter-editor-item{border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:12px; background:var(--card)}
+.chapter-editor-head{display:flex; gap:12px; align-items:center; margin-bottom:12px}
+.chapter-editor-head input{
+    flex:1; padding:10px 12px; background:var(--bg); color:var(--text);
+    border:1px solid var(--border); border-radius:6px; font-size:.9rem; outline:none;
+}
+.chapter-editor-head input:focus{border-color:var(--accent)}
+.chapter-editor-item textarea{
+    width:100%; min-height:200px; padding:14px; background:var(--bg); color:var(--text);
+    border:1px solid var(--border); border-radius:6px; font-size:.95rem; line-height:1.6;
+    resize:vertical; outline:none; font-family:var(--font-body);
+}
+.chapter-editor-item textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow)}
+
+.requirements{
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:20px 24px; margin-bottom:24px;
+}
+.requirements h3{
+    font-family:var(--font-head); font-size:.85rem; letter-spacing:2.5px;
+    text-transform:uppercase; color:var(--accent); margin-bottom:16px;
+    padding-bottom:12px; border-bottom:1px solid var(--border);
+}
+.req-list{list-style:none; display:flex; flex-direction:column; gap:10px}
+.req-item{
+    display:flex; align-items:flex-start; gap:12px; font-size:.9rem; line-height:1.5;
+    padding:8px 12px; border-radius:8px; transition:all .2s;
+}
+.req-item.ok{background:rgba(93,168,106,.08)}
+.req-item.fail{background:rgba(201,74,74,.08)}
+.req-icon{
+    flex-shrink:0; width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:bold; margin-top:2px;
+}
+.req-item.ok .req-icon{background:var(--success); color:white}
+.req-item.fail .req-icon{background:var(--danger); color:white}
+.req-item .req-text{flex:1}
+.req-item .req-text strong{font-family:var(--font-head); letter-spacing:.5px; font-weight:600}
+.req-item .req-text small{display:block; color:var(--text3); font-size:.78rem; margin-top:2px; font-style:italic}
+
+.agree-row{
+    display:flex; align-items:flex-start; gap:12px; padding:16px;
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    cursor:pointer; margin-bottom:20px; transition:all .2s;
+}
+.agree-row:hover{border-color:var(--accent)}
+.agree-row.checked{border-color:var(--success); background:rgba(93,168,106,.06)}
+.agree-row input{width:20px; height:20px; margin-top:2px; flex-shrink:0; accent-color:var(--accent); cursor:pointer}
+.agree-row .agree-text{font-size:.9rem; line-height:1.5}
+.agree-row .agree-text a{color:var(--accent); text-decoration:underline}
+
+.avatar-uploader{
+    display:flex; align-items:center; gap:20px; padding:20px;
+    background:var(--card); border:1px dashed var(--border);
+    border-radius:12px; margin-bottom:16px;
+}
+.avatar-uploader-info{flex:1; min-width:0}
+.avatar-uploader-info p{font-size:.85rem; color:var(--text3); margin-bottom:8px; font-style:italic}
+.avatar-preview{
+    width:100px; height:100px; border-radius:50%;
+    background:var(--accent); color:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:36px; overflow:hidden;
+    flex-shrink:0; border:3px solid var(--border);
+}
+.avatar-preview img{width:100%; height:100%; object-fit:cover}
+
+/* МЕССЕНДЖЕР */
+.messenger{
+    display:grid; grid-template-columns:320px 1fr;
+    height:calc(100vh - 64px); background:var(--bg); position:relative; z-index:1;
+}
+.chat-sidebar{
+    background:var(--panel); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; overflow:hidden;
+}
+.chat-sidebar-head{
+    padding:16px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.chat-sidebar-head h2{font-family:var(--font-head); font-size:.85rem; letter-spacing:3px; text-transform:uppercase; color:var(--accent)}
+.chat-tabs{display:flex; border-bottom:1px solid var(--border); overflow-x:auto}
+.chat-tab{
+    flex:1; min-width:80px; padding:11px 8px; background:none; border:none;
+    font-family:var(--font-head); font-size:.7rem; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--text3); cursor:pointer;
+    border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .2s;
+    white-space:nowrap;
+}
+.chat-tab.active{color:var(--accent); border-bottom-color:var(--accent)}
+.chat-list{flex:1; overflow-y:auto; padding:8px}
+
+.chat-item{
+    display:flex; gap:12px; padding:10px 12px; border-radius:8px;
+    cursor:pointer; transition:all .2s; margin-bottom:2px;
+}
+.chat-item:hover{background:var(--hover)}
+.chat-item.active{background:var(--hover); border-left:3px solid var(--accent); padding-left:9px}
+.chat-item-info{flex:1; min-width:0}
+.chat-item-name{font-family:var(--font-head); font-size:.85rem; color:var(--text); letter-spacing:.5px; margin-bottom:2px; display:flex; align-items:center; gap:6px}
+.chat-item-preview{font-size:.8rem; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.chat-item-unread{
+    background:#c94a4a; color:#fff; font-size:.65rem; border-radius:10px;
+    padding:1px 6px; font-family:var(--font-head); margin-left:auto; align-self:center;
+}
+
+.chat-main{display:flex; flex-direction:column; background:var(--bg2)}
+.chat-empty{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:var(--text3); font-family:var(--font-head); letter-spacing:2px; text-transform:uppercase;
+    font-size:.85rem; padding:40px; text-align:center;
+}
+.chat-empty-icon{font-size:64px; margin-bottom:20px; opacity:.4}
+.chat-header{
+    padding:14px 20px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px; background:var(--panel);
+}
+.chat-header .name{font-family:var(--font-head); font-size:.95rem; color:var(--text); letter-spacing:1px}
+.chat-header .status{font-size:.75rem; color:var(--text3); font-style:italic}
+.chat-messages{
+    flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:12px;
+}
+.msg{
+    max-width:70%; padding:10px 14px; border-radius:12px;
+    font-size:.95rem; line-height:1.5; word-wrap:break-word;
+    animation:msgIn .25s ease;
+}
+@keyframes msgIn{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+.msg-in{background:var(--msg-in); align-self:flex-start; border-bottom-left-radius:4px; border:1px solid var(--border)}
+.msg-out{background:var(--msg-out); color:var(--text); align-self:flex-end; border-bottom-right-radius:4px}
+.msg-author{font-family:var(--font-head); font-size:.72rem; color:var(--accent); letter-spacing:1px; margin-bottom:4px; text-transform:uppercase}
+.msg-time{font-size:.7rem; opacity:.6; margin-top:4px; text-align:right; font-family:var(--font-head)}
+.chat-input-area{
+    padding:16px 20px; border-top:1px solid var(--border);
+    background:var(--panel); display:flex; gap:12px;
+}
+.chat-input-area textarea{
+    flex:1; padding:12px 16px; background:var(--card); color:var(--text);
+    border:1px solid var(--border); border-radius:10px; font-size:.95rem;
+    outline:none; resize:none; font-family:var(--font-body); line-height:1.5;
+    max-height:120px; min-height:44px; transition:border-color .2s;
+}
+.chat-input-area textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow)}
+.send-btn{
+    padding:12px 24px; background:var(--accent); color:var(--bg);
+    border:none; border-radius:10px; font-family:var(--font-head);
+    font-size:.8rem; letter-spacing:2px; text-transform:uppercase; font-weight:600;
+    cursor:pointer; transition:all .2s;
+}
+.send-btn:hover{background:var(--accent2); color:var(--text)}
+
+/* МОДАЛКИ */
+.overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(8px);
+    z-index:200; display:none; align-items:center; justify-content:center; padding:20px;
+}
+.overlay.active{display:flex}
+.modal{
+    background:var(--panel); border:2px solid var(--accent); border-radius:12px;
+    width:100%; max-width:440px; padding:32px 28px; position:relative;
+    box-shadow:0 20px 60px rgba(0,0,0,.8); max-height:90vh; overflow-y:auto;
+    animation:modalIn .25s ease;
+}
+@keyframes modalIn{
+    from{opacity:0; transform:scale(.95) translateY(10px)}
+    to{opacity:1; transform:scale(1) translateY(0)}
+}
+.modal-wide{max-width:640px}
+.modal-close{
+    position:absolute; top:12px; right:16px; background:none; border:none;
+    color:var(--text3); font-size:26px; transition:color .2s; cursor:pointer;
+}
+.modal-close:hover{color:var(--accent)}
+.modal h2{font-family:var(--font-title); font-size:1.6rem; color:var(--text); margin-bottom:8px; text-align:center}
+.modal .modal-sub{text-align:center; color:var(--text2); font-style:italic; margin-bottom:24px; font-size:.9rem}
+
+.tabs{display:flex; gap:6px; margin-bottom:24px; border-bottom:1px solid var(--border)}
+.tab{
+    flex:1; padding:12px 8px; background:none; border:none;
+    font-family:var(--font-head); font-size:.8rem; letter-spacing:2px;
+    text-transform:uppercase; color:var(--text3); cursor:pointer;
+    border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .2s;
+}
+.tab.active{color:var(--accent); border-bottom-color:var(--accent)}
+.error-text{color:var(--danger); font-size:.85rem; font-style:italic; text-align:center; min-height:20px; margin-bottom:8px}
+.success-text{color:var(--success); font-size:.85rem; font-style:italic; text-align:center; min-height:20px; margin-bottom:8px}
+
+.divider-or{
+    display:flex; align-items:center; gap:12px; margin:20px 0;
+    color:var(--text3); font-family:var(--font-head); font-size:.72rem;
+    letter-spacing:2px; text-transform:uppercase;
+}
+.divider-or::before, .divider-or::after{content:''; flex:1; height:1px; background:var(--border)}
+
+.toast{
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--card); color:var(--text); padding:12px 24px;
+    border:1px solid var(--accent); border-radius:8px;
+    font-family:var(--font-head); font-size:.85rem; letter-spacing:1px;
+    z-index:500; opacity:0; transition:all .3s;
+    box-shadow:0 8px 30px rgba(0,0,0,.5), 0 0 20px var(--glow);
+    max-width:90vw;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--success)}
+.toast.error{border-color:var(--danger)}
+
+.footer{
+    padding:60px 0 40px; border-top:1px solid var(--border); margin-top:60px;
+    text-align:center; color:var(--text3); font-family:var(--font-head);
+    font-size:.75rem; letter-spacing:1.5px; text-transform:uppercase;
+}
+
+@media(max-width:1000px){
+    .global-search{display:none}
+    .nav-links{display:none}
+}
+@media(max-width:900px){
+    .book-layout{grid-template-columns:1fr; gap:24px}
+    .book-cover-large{max-width:200px; margin:0 auto 20px}
+    .book-info{text-align:center}
+    .book-info .meta-line{justify-content:center}
+    .hero h1{font-size:2.6rem}
+    .brand-name small{display:none}
+    .messenger{grid-template-columns:1fr}
+    .chat-sidebar{position:absolute; inset:0; z-index:10; transition:transform .3s}
+    .chat-sidebar.hide-mobile{transform:translateX(-100%)}
+    .chat-main{grid-column:1}
+    .chat-back-btn{display:inline-flex !important}
+    .side-panel{width:100%; max-width:100%}
+    .profile-banner{height:120px}
+    .profile-main{padding:0 20px 24px}
+    .profile-avatar{width:100px; height:100px; font-size:38px}
+    .profile-name{font-size:1.5rem}
+    .reading-item{flex-direction:column; align-items:stretch; text-align:center}
+    .reading-cover{margin:0 auto}
+    .reading-actions{flex-direction:row; justify-content:center}
+    .cover-uploader{flex-direction:column; align-items:center}
+}
+@media(max-width:600px){
+    .hero{padding:50px 0 30px}
+    .hero h1{font-size:2rem}
+    .hero .subtitle{font-size:1.1rem}
+    .books-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:16px}
+    .reader-content h2{font-size:1.5rem}
+    .topbar-inner{padding:0 12px; gap:8px}
+    .user-chip span:not(.avatar){display:none}
+    .icon-btn{width:36px; height:36px; font-size:14px}
+    .my-book-item{flex-direction:column; align-items:stretch; text-align:center}
+    .my-book-cover{margin:0 auto}
+    .my-book-actions{justify-content:center}
+    .msg{max-width:85%}
+    .brand-counter{display:none}
+    .brand-name{font-size:.8rem}
+    .communities-grid{grid-template-columns:1fr}
+}
+.chat-back-btn{
+    display:none; padding:8px 12px; background:none; border:1px solid var(--border);
+    border-radius:8px; color:var(--text2); font-size:16px; cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <div class="brand" id="brandBtn">
+            <div class="brand-sigil">✦</div>
+            <div class="brand-name">
+                Северная Библиотека
+                <small>читай · публикуй · общайся</small>
+            </div>
+            <div class="brand-counter" id="topCounter">0 книг</div>
+        </div>
+
+        <div class="global-search" id="globalSearchWrap">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="globalSearchInput" placeholder="Поиск: @юзернейм, книга, сообщество...">
+            <div class="global-search-results" id="globalSearchResults"></div>
+        </div>
+
+        <nav class="nav-links" id="navLinks">
+            <button class="nav-link active" data-page="home">Главная</button>
+            <button class="nav-link" data-page="catalog">Каталог</button>
+            <button class="nav-link" data-page="communities">Сообщества</button>
+            <button class="nav-link" data-page="mybooks">Мои книги</button>
+            <button class="nav-link" data-page="reading">Моё чтение</button>
+            <button class="nav-link" data-page="messages">Сообщения <span class="badge" id="unreadBadge" style="display:none">0</span></button>
+        </nav>
+
+        <div class="topbar-actions" id="topbarActions"></div>
+    </div>
+</header>
+
+<!-- ПАНЕЛЬ ПОЛЬЗОВАТЕЛЕЙ -->
+<div class="side-backdrop" id="usersBackdrop"></div>
+<aside class="side-panel" id="usersPanel">
+    <div class="side-panel-head">
+        <div>
+            <div class="title">Пользователи</div>
+            <div class="counter" id="usersCounter">Всего: 0 · <span class="online-num">0 в сети</span></div>
+        </div>
+        <button class="icon-btn" id="usersPanelClose" title="Закрыть">×</button>
+    </div>
+    <div class="side-panel-search">
+        <input type="text" id="usersSearch" placeholder="Поиск по имени или @юзернейму...">
+    </div>
+    <div class="side-panel-body" id="usersPanelBody"></div>
+</aside>
+
+<!-- ПАНЕЛЬ ДРУЗЕЙ -->
+<div class="side-backdrop" id="friendsBackdrop"></div>
+<aside class="side-panel" id="friendsPanel">
+    <div class="side-panel-head">
+        <div>
+            <div class="title">Друзья</div>
+            <div class="counter" id="friendsCounter">Друзей: 0 · <span class="online-num">0 в сети</span></div>
+        </div>
+        <button class="icon-btn" id="friendsPanelClose" title="Закрыть">×</button>
+    </div>
+    <div class="side-panel-tabs">
+        <button class="side-panel-tab active" data-ftab="friends">Мои друзья <span class="tab-badge" id="friendsCountBadge" style="display:none">0</span></button>
+        <button class="side-panel-tab" data-ftab="incoming">Заявки <span class="tab-badge" id="incomingCountBadge" style="display:none">0</span></button>
+        <button class="side-panel-tab" data-ftab="outgoing">Отправленные</button>
+    </div>
+    <div class="side-panel-search">
+        <input type="text" id="friendsSearch" placeholder="Найти по @юзернейму или имени...">
+    </div>
+    <div class="side-panel-body" id="friendsPanelBody"></div>
+</aside>
+
+<main id="app"></main>
+
+<!-- МОДАЛКА ВХОДА/РЕГИСТРАЦИИ -->
+<div class="overlay" id="authOverlay">
+    <div class="modal">
+        <button class="modal-close" data-close="authOverlay">&times;</button>
+        <h2>Добро пожаловать</h2>
+        <div class="modal-sub">Войдите или создайте аккаунт</div>
+        <div class="tabs">
+            <button class="tab active" data-tab="login">Вход</button>
+            <button class="tab" data-tab="register">Регистрация</button>
+        </div>
+        <form id="loginForm">
+            <div class="field">
+                <label>Email или @юзернейм</label>
+                <input type="text" id="loginUser" placeholder="you@example.com или @username" autocomplete="username">
+            </div>
+            <div class="field">
+                <label>Пароль</label>
+                <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <div class="error-text" id="loginError"></div>
+            <button type="submit" class="btn btn-primary btn-block">Войти</button>
+        </form>
+        <form id="registerForm" style="display:none">
+            <div class="field">
+                <label>Имя пользователя <span class="req">*</span></label>
+                <input type="text" id="regUser" placeholder="Минимум 3 символа" autocomplete="username">
+                <div class="hint">Это ваше отображаемое имя.</div>
+            </div>
+            <div class="field">
+                <label>@юзернейм <span class="req">*</span></label>
+                <input type="text" id="regUsername" placeholder="латиница, цифры, _" autocomplete="off">
+                <div class="hint">Уникальный ник, по которому вас найдут. Только латиница, цифры и _ (2-20 символов).</div>
+            </div>
+            <div class="field">
+                <label>Email <span class="req">*</span></label>
+                <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="field">
+                <label>Пароль <span class="req">*</span></label>
+                <input type="password" id="regPass" placeholder="Минимум 4 символа" autocomplete="new-password">
+            </div>
+            <div class="field">
+                <label>Повторите пароль <span class="req">*</span></label>
+                <input type="password" id="regPass2" placeholder="••••••••" autocomplete="new-password">
+            </div>
+            <div class="error-text" id="regError"></div>
+            <button type="submit" class="btn btn-primary btn-block">Создать аккаунт</button>
+        </form>
+        <div class="divider-or">или</div>
+        <button class="btn btn-google btn-block" id="googleBtn">
+            <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+                <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+                <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571.001-.001.002-.001.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+            </svg>
+            Войти через Google
+        </button>
+    </div>
+</div>
+
+<!-- МОДАЛКА GOOGLE -->
+<div class="overlay" id="googleOverlay">
+    <div class="modal">
+        <button class="modal-close" data-close="googleOverlay">&times;</button>
+        <h2>Вход через Google</h2>
+        <div class="modal-sub">Введите email, имя и @юзернейм</div>
+        <form id="googleForm">
+            <div class="field">
+                <label>Email Google <span class="req">*</span></label>
+                <input type="email" id="googleEmail" placeholder="you@gmail.com">
+            </div>
+            <div class="field">
+                <label>Имя (для отображения) <span class="req">*</span></label>
+                <input type="text" id="googleName" placeholder="Ваше имя">
+            </div>
+            <div class="field">
+                <label>@юзернейм <span class="req">*</span></label>
+                <input type="text" id="googleUsername" placeholder="латиница, цифры, _">
+            </div>
+            <div class="error-text" id="googleError"></div>
+            <button type="submit" class="btn btn-primary btn-block">Войти</button>
+        </form>
+    </div>
+</div>
+
+<!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+<div class="overlay" id="editProfileOverlay">
+    <div class="modal modal-wide">
+        <button class="modal-close" data-close="editProfileOverlay">&times;</button>
+        <h2>Редактировать профиль</h2>
+        <div class="modal-sub">Настройте своё присутствие на сайте</div>
+        <form id="editProfileForm">
+            <div class="avatar-uploader">
+                <div class="avatar-preview" id="avatarPreview">?</div>
+                <div class="avatar-uploader-info">
+                    <p>Аватар — фотография профиля. Рекомендуем квадратное изображение.</p>
+                    <input type="file" id="avatarInput" accept="image/*" style="display:none">
+                    <div style="display:flex; gap:8px; flex-wrap:wrap">
+                        <button type="button" class="btn btn-sm" id="avatarChooseBtn">Загрузить</button>
+                        <button type="button" class="btn btn-ghost btn-sm" id="avatarRemoveBtn">Удалить</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Имя (отображаемое) <span class="req">*</span></label>
+                <input type="text" id="editDisplayName" placeholder="Как вас называть" maxlength="40">
+            </div>
+            <div class="field">
+                <label>@юзернейм <span class="req">*</span></label>
+                <input type="text" id="editUsername" placeholder="латиница, цифры, _">
+                <div class="hint">По этому нику вас найдут другие. Латиница, цифры, _, 2-20 символов.</div>
+            </div>
+            <div class="field">
+                <label>О себе</label>
+                <textarea id="editBio" placeholder="Коротко о вас: что пишете, что читаете..." maxlength="300"></textarea>
+                <div class="hint"><span id="bioCount">0</span> / 300</div>
+            </div>
+            <div class="error-text" id="editProfileError"></div>
+            <button type="submit" class="btn btn-primary btn-block">Сохранить изменения</button>
+
+            <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border)">
+                <button type="button" class="btn btn-danger btn-block" id="deleteAccountBtn">
+                    Удалить аккаунт
+                </button>
+                <div class="hint" style="text-align:center; margin-top:8px; color:var(--text3); font-style:italic; font-size:.78rem">
+                    Все ваши книги, сообщения и данные будут удалены безвозвратно
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- МОДАЛКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ АККАУНТА -->
+<div class="overlay" id="deleteAccountOverlay">
+    <div class="modal" style="max-width:420px">
+        <button class="modal-close" data-close="deleteAccountOverlay">&times;</button>
+        <h2>Удалить аккаунт?</h2>
+        <div class="modal-sub">Это действие нельзя отменить</div>
+
+        <div style="background:var(--card); border:1px solid var(--danger); border-radius:10px; padding:16px; margin-bottom:20px; font-size:.88rem; line-height:1.6; color:var(--text2)">
+            Будут <strong style="color:var(--danger)">безвозвратно удалены</strong>:
+            <ul style="margin-top:8px; padding-left:20px">
+                <li>Ваш профиль и аватар</li>
+                <li>Все ваши книги и главы</li>
+                <li>Все ваши сообщения</li>
+                <li>Друзья и заявки</li>
+                <li>Созданные вами сообщества</li>
+            </ul>
+        </div>
+
+        <div class="field">
+            <label>Введите ваш @юзернейм для подтверждения</label>
+            <input type="text" id="deleteConfirmInput" placeholder="@username" autocomplete="off">
+        </div>
+        <div class="error-text" id="deleteAccountError"></div>
+
+        <div style="display:flex; gap:10px">
+            <button class="btn btn-ghost" style="flex:1" data-close="deleteAccountOverlay">Отмена</button>
+            <button class="btn btn-danger" style="flex:1" id="deleteAccountConfirmBtn">Удалить навсегда</button>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛКА СОЗДАНИЯ СООБЩЕСТВА -->
+<div class="overlay" id="newCommunityOverlay">
+    <div class="modal modal-wide">
+        <button class="modal-close" data-close="newCommunityOverlay">&times;</button>
+        <h2>Новое сообщество</h2>
+        <div class="modal-sub">Объедините людей вокруг темы</div>
+        <form id="newCommunityForm">
+            <div class="avatar-uploader">
+                <div class="avatar-preview" id="communityAvatarPreview" style="border-radius:16px">#</div>
+                <div class="avatar-uploader-info">
+                    <p>Аватар сообщества. Логотип, эмблема или картинка.</p>
+                    <input type="file" id="communityAvatarInput" accept="image/*" style="display:none">
+                    <div style="display:flex; gap:8px; flex-wrap:wrap">
+                        <button type="button" class="btn btn-sm" id="communityAvatarChooseBtn">Загрузить</button>
+                        <button type="button" class="btn btn-ghost btn-sm" id="communityAvatarRemoveBtn">Удалить</button>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>Название <span class="req">*</span></label>
+                <input type="text" id="communityTitle" placeholder="Например: Любители тёмного фэнтези" maxlength="60">
+            </div>
+            <div class="field">
+                <label>@юзернейм сообщества <span class="req">*</span></label>
+                <input type="text" id="communityUsername" placeholder="fantasy_lovers">
+                <div class="hint">Латиница, цифры, _, 3-24 символа.</div>
+            </div>
+            <div class="field">
+                <label>Описание <span class="req">*</span></label>
+                <textarea id="communityDesc" placeholder="О чём сообщество, для кого, какие правила..." maxlength="500"></textarea>
+                <div class="hint"><span id="communityDescCount">0</span> / 500 · минимум 20</div>
+            </div>
+            <div class="error-text" id="newCommunityError"></div>
+            <button type="submit" class="btn btn-primary btn-block">Создать сообщество</button>
+        </form>
+    </div>
+</div>
+
+<!-- МОДАЛКА ПРАВИЛ (открывается из редактора книги) -->
+<div class="overlay" id="rulesOverlay">
+    <div class="modal modal-wide">
+        <button class="modal-close" data-close="rulesOverlay">&times;</button>
+        <h2>Правила публикации книг</h2>
+        <div class="modal-sub">Перед публикацией книги автор обязан выполнить все условия</div>
+        <div style="color:var(--text2); line-height:1.8; font-size:.95rem">
+            <p style="margin-bottom:14px"><strong style="color:var(--accent); font-family:var(--font-head)">1. Объём книги</strong><br>Не менее одной полной главы, каждая — от 500 символов.</p>
+            <p style="margin-bottom:14px"><strong style="color:var(--accent); font-family:var(--font-head)">2. Аннотация</strong><br>Не менее 80 символов, отражает содержание.</p>
+            <p style="margin-bottom:14px"><strong style="color:var(--accent); font-family:var(--font-head)">3. Жанр и название</strong><br>Укажите жанр. Название не короче 3 символов.</p>
+            <p style="margin-bottom:14px"><strong style="color:var(--accent); font-family:var(--font-head)">4. Согласие</strong><br>Автор подтверждает право на публикацию. Запрещены: плагиат, экстремизм, разжигание ненависти, материалы 18+ без пометки.</p>
+            <p style="color:var(--text3); font-style:italic">Нарушение ведёт к удалению и блокировке.</p>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛКА ПОДТВЕРЖДЕНИЯ ВЫХОДА -->
+<div class="overlay" id="logoutOverlay">
+    <div class="modal" style="max-width:380px">
+        <button class="modal-close" data-close="logoutOverlay">&times;</button>
+        <h2>Выход из аккаунта</h2>
+        <div class="modal-sub">Вы уверены, что хотите выйти?</div>
+
+        <div style="display:flex; align-items:center; gap:16px; padding:16px; background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:24px" id="logoutUserBox">
+            <!-- Заполнится через JS -->
+        </div>
+
+        <div style="display:flex; gap:10px">
+            <button class="btn btn-ghost" style="flex:1" data-close="logoutOverlay">Отмена</button>
+            <button class="btn btn-danger" style="flex:1" id="logoutConfirmBtn">Выйти</button>
+        </div>
+
+        <div class="hint" style="text-align:center; margin-top:16px; color:var(--text3); font-style:italic; font-size:.8rem">
+            Вы всегда сможете войти снова
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ====================== СПИСОК ЖАНРОВ ====================== */
+const GENRES = [
+    'Тёмное фэнтези',
+    'Эпическое фэнтези',
+    'Городское фэнтези',
+    'Юмористическое фэнтези',
+    'Историческое фэнтези',
+    'Научная фантастика',
+    'Космическая фантастика',
+    'Киберпанк',
+    'Стимпанк',
+    'Постапокалипсис',
+    'Антиутопия',
+    'Утопия',
+    'Хоррор',
+    'Мистика',
+    'Триллер',
+    'Детектив',
+    'Криминал',
+    'Боевик',
+    'Приключения',
+    'Исторический роман',
+    'Историческая проза',
+    'Любовный роман',
+    'Романтическое фэнтези',
+    'Современная проза',
+    'Классическая проза',
+    'Драма',
+    'Трагедия',
+    'Комедия',
+    'Сатира',
+    'Поэзия',
+    'Публицистика',
+    'Биография',
+    'Мемуары',
+    'Нон-фикшн',
+    'Философия',
+    'Психология',
+    'Саморазвитие',
+    'Религия и духовность',
+    'Детская литература',
+    'Подростковая литература',
+    'Young Adult',
+    'Новелла',
+    'Рассказ',
+    'Сборник',
+    'Фанфик',
+    'ЛитРПГ',
+    'РеалРПГ',
+    'Попаданцы',
+    'Бояръ-аниме',
+    'Славянское фэнтези',
+    'Другое'
+];
+
+/* ====================== ХРАНИЛИЩЕ (localStorage — временно) ====================== */
+const KEYS = {
+    users: 'sb_users_v5',
+    session: 'sb_session_v5',
+    books: 'sb_books_v5',
+    chats: 'sb_chats_v5',
+    messages: 'sb_messages_v5',
+    lastReads: 'sb_lastreads_v5',
+    lastSeen: 'sb_lastseen_v5',
+    friends: 'sb_friends_v5',
+    communities: 'sb_communities_v5',
+    theme: 'sb_theme_v5',
+    readingProgress: 'sb_reading_progress_v1'
+};
+
+function load(key, fallback) {
+    try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback; } catch(e){ return fallback; }
+}
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+
+/* ====================== API-КЛИЕНТ ====================== */
+const API_BASE = ''; // тот же origin, что и сайт
+
+async function api(path, options = {}) {
+    const opts = {
+        method: options.method || 'GET',
+        credentials: 'include',
+        headers: {
+            'Accept': 'application/json',
+            ...(options.headers || {}),
+        },
+    };
+    if (options.body !== undefined) {
+        opts.headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(options.body);
+    }
+    const res = await fetch(API_BASE + path, opts);
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch(e) { data = text; }
+    if (!res.ok) {
+        const msg = (data && (data.detail || data.error)) || `Ошибка ${res.status}`;
+        const err = new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+        err.status = res.status;
+        err.data = data;
+        throw err;
+    }
+    return data;
+}
+
+/* ====================== API: КНИГИ ====================== */
+async function apiGetBooks(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    const path = '/api/books' + (qs ? '?' + qs : '');
+    const books = await api(path);
+    return books.map(normalizeBook);
+}
+
+async function apiGetBook(id) {
+    const b = await api('/api/books/' + id);
+    return normalizeBookWithChapters(b);
+}
+
+async function apiGetMyBooks() {
+    const books = await api('/api/books/me');
+    return books.map(normalizeBook);
+}
+
+async function apiCreateBook(data) {
+    const b = await api('/api/books', { method: 'POST', body: data });
+    return normalizeBookWithChapters(b);
+}
+
+async function apiUpdateBook(id, data) {
+    const b = await api('/api/books/' + id, { method: 'PUT', body: data });
+    return normalizeBookWithChapters(b);
+}
+
+async function apiDeleteBook(id) {
+    await api('/api/books/' + id, { method: 'DELETE' });
+}
+
+async function apiUploadImage(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Ошибка загрузки');
+    }
+    return await res.json();
+}
+
+/* ====================== API: ПОЛЬЗОВАТЕЛИ ====================== */
+async function apiGetUsers(q = '') {
+    const qs = q ? '?q=' + encodeURIComponent(q) : '';
+    const users = await api('/api/users' + qs);
+    return users.map(normalizeUser);
+}
+
+async function apiGetUser(userId) {
+    const u = await api('/api/users/' + userId);
+    return normalizeUser(u);
+}
+
+/* ====================== API: ДРУЗЬЯ ====================== */
+async function apiGetFriends() {
+    try {
+        const users = await api('/api/friends');
+        return users.map(normalizeUser);
+    } catch(e) {
+        return [];
+    }
+}
+
+async function apiGetIncomingRequests() {
+    try {
+        const users = await api('/api/friends/incoming');
+        return users.map(normalizeUser);
+    } catch(e) {
+        return [];
+    }
+}
+
+async function apiGetOutgoingRequests() {
+    try {
+        const users = await api('/api/friends/outgoing');
+        return users.map(normalizeUser);
+    } catch(e) {
+        return [];
+    }
+}
+
+async function apiSendFriendRequest(userId) {
+    return await api('/api/friends/request', {
+        method: 'POST',
+        body: { toUserId: userId }
+    });
+}
+
+async function apiAcceptFriend(userId) {
+    return await api('/api/friends/' + userId + '/accept', { method: 'POST' });
+}
+
+async function apiDeclineFriend(userId) {
+    return await api('/api/friends/' + userId + '/decline', { method: 'POST' });
+}
+
+async function apiRemoveFriend(userId) {
+    return await api('/api/friends/' + userId, { method: 'DELETE' });
+}
+
+/* ====================== API: СООБЩЕСТВА ====================== */
+async function apiGetCommunities() {
+    const list = await api('/api/communities');
+    return list.map(normalizeCommunity);
+}
+
+async function apiGetCommunity(id) {
+    const c = await api('/api/communities/' + id);
+    return normalizeCommunity(c);
+}
+
+async function apiCreateCommunity(data) {
+    const c = await api('/api/communities', { method: 'POST', body: data });
+    return normalizeCommunity(c);
+}
+
+async function apiGetCommunityMembers(id) {
+    const users = await api('/api/communities/' + id + '/members');
+    return users.map(normalizeUser);
+}
+
+async function apiIsJoinedCommunity(id) {
+    try {
+        const r = await api('/api/communities/' + id + '/joined');
+        return !!r.joined;
+    } catch(e) {
+        return false;
+    }
+}
+
+async function apiJoinCommunity(id) {
+    return await api('/api/communities/' + id + '/join', { method: 'POST' });
+}
+
+async function apiLeaveCommunity(id) {
+    return await api('/api/communities/' + id + '/leave', { method: 'POST' });
+}
+
+async function apiGetMyCommunities() {
+    try {
+        const list = await api('/api/communities/me/list');
+        return list.map(normalizeCommunity);
+    } catch(e) {
+        return [];
+    }
+}
+
+/* ====================== НОРМАЛИЗАЦИЯ СООБЩЕСТВ ====================== */
+function normalizeCommunity(c) {
+    if (!c) return null;
+    return {
+        id: c.id,
+        title: c.title,
+        username: c.username,
+        desc: c.description || c.desc || '',
+        avatar: c.avatarUrl || c.avatar || null,
+        owner: c.ownerId || c.owner || null,
+        members: c.members || [],          // массив usernames (или пусто)
+        membersCount: c.membersCount || (c.members ? c.members.length : 0),
+        createdAt: c.createdAt ? new Date(c.createdAt).getTime() : Date.now(),
+    };
+}
+
+/* ====================== API: ЧАТЫ ====================== */
+async function apiOpenDM(userId) {
+    const r = await api('/api/messages/dm', {
+        method: 'POST',
+        body: { userId }
+    });
+    return r.chatId;
+}
+
+async function apiGetMyChats() {
+    try {
+        const list = await api('/api/messages/chats');
+        return list;
+    } catch(e) {
+        console.error('Ошибка загрузки чатов:', e);
+        return [];
+    }
+}
+
+async function apiGetChatMessages(chatId) {
+    try {
+        const list = await api('/api/messages/chats/' + chatId + '/messages');
+        return list;
+    } catch(e) {
+        console.error('Ошибка загрузки сообщений:', e);
+        return [];
+    }
+}
+
+/* ====================== WEBSOCKET ДЛЯ ЧАТА ====================== */
+let _ws = null;
+let _wsChatId = null;
+let _wsHandlers = [];
+
+function connectChatWS(chatId, onMessage) {
+    // Если уже подключены к этому чату — только меняем обработчик
+    if (_ws && _wsChatId === chatId) {
+        if (onMessage) _wsHandlers.push(onMessage);
+        return;
+    }
+
+    // Закрываем старое соединение
+    disconnectChatWS();
+
+    _wsChatId = chatId;
+    _wsHandlers = onMessage ? [onMessage] : [];
+
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const url = proto + '//' + location.host + '/ws/chat/' + chatId;
+
+    try {
+        _ws = new WebSocket(url);
+    } catch(e) {
+        console.error('WebSocket не создан:', e);
+        return;
+    }
+
+    _ws.onopen = () => {
+        console.log('[WS] Подключено к чату', chatId);
+    };
+
+    _ws.onmessage = (event) => {
+        try {
+            const msg = JSON.parse(event.data);
+            _wsHandlers.forEach(h => h(msg));
+        } catch(e) {
+            console.error('WS parse error:', e);
+        }
+    };
+
+    _ws.onerror = (err) => {
+        console.error('[WS] Ошибка:', err);
+    };
+
+    _ws.onclose = () => {
+        console.log('[WS] Отключено от чата', chatId);
+    };
+}
+
+function sendChatWS(text) {
+    if (!_ws || _ws.readyState !== WebSocket.OPEN) {
+        console.warn('[WS] Не подключено — не могу отправить');
+        return false;
+    }
+    _ws.send(JSON.stringify({ text }));
+    return true;
+}
+
+function disconnectChatWS() {
+    if (_ws) {
+        try { _ws.close(); } catch(e) {}
+        _ws = null;
+        _wsChatId = null;
+        _wsHandlers = [];
+    }
+}
+
+/* ====================== КЭШ ДРУЗЕЙ ====================== */
+let _friendsCache = { friends: [], incoming: [], outgoing: [] };
+
+async function loadFriendsData() {
+    if (!getCurrentUser()) {
+        _friendsCache = { friends: [], incoming: [], outgoing: [] };
+        return;
+    }
+    try {
+        const [friends, incoming, outgoing] = await Promise.all([
+            apiGetFriends(),
+            apiGetIncomingRequests(),
+            apiGetOutgoingRequests()
+        ]);
+        _friendsCache = { friends, incoming, outgoing };
+    } catch(e) {
+        console.error('Ошибка загрузки друзей:', e);
+        _friendsCache = { friends: [], incoming: [], outgoing: [] };
+    }
+    return _friendsCache;
+}
+
+/* ====================== КЭШ ПОЛЬЗОВАТЕЛЕЙ ====================== */
+let _usersCache = {};
+
+async function loadUsersCache() {
+    if (!getCurrentUser()) {
+        _usersCache = {};
+        return;
+    }
+    try {
+        const users = await apiGetUsers();
+        _usersCache = {};
+        users.forEach(u => {
+            _usersCache[u.username] = {
+                handle: u.username,
+                email: u.email,
+                displayName: u.displayName,
+                bio: u.bio,
+                avatar: u.avatar,
+                id: u.id,
+            };
+        });
+    } catch(e) {
+        console.error('Ошибка загрузки пользователей:', e);
+    }
+    return _usersCache;
+}
+
+/* ====================== КЭШ СООБЩЕСТВ ====================== */
+let _communitiesCache = [];
+
+async function loadCommunitiesCache() {
+    try {
+        _communitiesCache = await apiGetCommunities();
+    } catch(e) {
+        console.error('Ошибка загрузки сообществ:', e);
+        _communitiesCache = [];
+    }
+    return _communitiesCache;
+}
+
+async function loadMyCommunitiesCache() {
+    if (!getCurrentUser()) return [];
+    try {
+        return await apiGetMyCommunities();
+    } catch(e) {
+        return [];
+    }
+}
+
+/* ====================== API: ПРОГРЕСС ЧТЕНИЯ ====================== */
+async function apiSaveProgress(bookId, chapterIndex) {
+    try {
+        await api('/api/books/' + bookId + '/progress', {
+            method: 'POST',
+            body: { chapterIndex }
+        });
+    } catch(e) {
+        console.error('Ошибка сохранения прогресса:', e);
+    }
+}
+
+async function apiGetMyReading() {
+    try {
+        const list = await api('/api/books/me/reading');
+        return list.map(item => ({
+            book: normalizeBook(item.book),
+            chapterIndex: item.chapterIndex,
+            updatedAt: item.updatedAt ? new Date(item.updatedAt).getTime() : Date.now(),
+        }));
+    } catch(e) {
+        console.error('Ошибка загрузки прогресса:', e);
+        return [];
+    }
+}
+
+/* ====================== НОРМАЛИЗАЦИЯ ====================== */
+function normalizeBook(b) {
+    if (!b) return null;
+    return {
+        id: b.id,
+        title: b.title,
+        author: b.authorUsername || b.author || '?',
+        annotation: b.annotation,
+        genre: b.genre,
+        cover: b.coverUrl || null,
+        coverSymbol: b.coverSymbol || '📖',
+        status: b.status || 'published',
+        chaptersCount: b.chaptersCount || 0,
+        createdAt: b.createdAt ? new Date(b.createdAt).getTime() : Date.now(),
+        updatedAt: b.updatedAt ? new Date(b.updatedAt).getTime() : Date.now(),
+    };
+}
+
+function normalizeBookWithChapters(b) {
+    const base = normalizeBook(b);
+    if (!base) return null;
+    base.chapters = (b.chapters || []).map(ch => ({
+        id: ch.id,
+        title: ch.title,
+        content: ch.content,
+        order: ch.order,
+    }));
+    return base;
+}
+
+/* ====================== КЕШ КНИГ ====================== */
+let _booksCache = [];
+
+async function loadBooks() {
+    try {
+        _booksCache = await apiGetBooks();
+    } catch(e) {
+        console.error('Ошибка загрузки книг:', e);
+        _booksCache = [];
+    }
+    return _booksCache;
+}
+
+function getAllBooks() {
+    return _booksCache.slice();
+}
+
+function getBooksCount() {
+    return _booksCache.length;
+}
+
+/* ====================== ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ ====================== */
+let _currentUser = null;
+let _currentUserLoaded = false;
+
+async function loadCurrentUser() {
+    try {
+        const u = await api('/api/auth/me');
+        _currentUser = u ? normalizeUser(u) : null;
+    } catch(e) {
+        _currentUser = null;
+    }
+    _currentUserLoaded = true;
+    return _currentUser;
+}
+
+function getCurrentUser() {
+    return _currentUser;
+}
+
+function normalizeUser(u) {
+    if (!u) return null;
+    return {
+        username: u.username,
+        id: u.id,
+        handle: u.username,
+        displayName: u.displayName || u.username,
+        email: u.email || null,
+        bio: u.bio || '',
+        avatar: u.avatarUrl || null,
+        google: false,
+    };
+}
+
+/* ====================== АВТОРИЗАЦИЯ ====================== */
+async function apiRegister({ username, email, password, displayName }) {
+    const u = await api('/api/auth/register', {
+        method: 'POST',
+        body: { username, email, password, displayName },
+    });
+    _currentUser = normalizeUser(u);
+    _currentUserLoaded = true;
+    return _currentUser;
+}
+
+async function apiLogin({ login, password }) {
+    const u = await api('/api/auth/login', {
+        method: 'POST',
+        body: { login, password },
+    });
+    _currentUser = normalizeUser(u);
+    _currentUserLoaded = true;
+    return _currentUser;
+}
+
+async function apiLogout() {
+    try { await api('/api/auth/logout', { method: 'POST' }); } catch(e) {}
+    _currentUser = null;
+}
+
+/* ====================== УТИЛИТЫ ====================== */
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+function isValidUsername(username) {
+    return /^[A-Za-z0-9_]{2,20}$/.test(username);
+}
+function isValidCommunityUsername(username) {
+    return /^[A-Za-z0-9_]{3,24}$/.test(username);
+}
+
+// Заглушки для совместимости
+function getUsers() { return _usersCache; }
+function saveUsers() {}
+function setSession() {}
+function clearSession() {}
+
+function findUserByUsername(handle) {
+    if (!handle) return null;
+    const u = _currentUser;
+    if (u && (u.username === handle || u.handle === handle.replace(/^@/, ''))) return u;
+    return null;
+}
+function findUserByEmail() { return null; }
+function isHandleTaken() { return false; }
+
+function displayName(user) {
+    if (typeof user === 'string') {
+        if (_currentUser && _currentUser.username === user) return _currentUser.displayName;
+        return user;
+    }
+    if (!user) return '?';
+    return user.displayName || user.username;
+}
+
+async function hash(s) { return s; }
+
+/* ====================== ПРОГРЕСС ЧТЕНИЯ (временно localStorage) ====================== */
+function getAllReadingProgress() { return load(KEYS.readingProgress, {}); }
+function saveAllReadingProgress(p) { save(KEYS.readingProgress, p); }
+
+function getReadingProgress(username, bookId) {
+    if (!username || !bookId) return null;
+    const all = getAllReadingProgress();
+    return (all[username] && all[username][bookId]) || null;
+}
+
+function setReadingProgress(username, bookId, chapterIndex, chapterId) {
+    if (!username || !bookId) return;
+    const all = getAllReadingProgress();
+    if (!all[username]) all[username] = {};
+    all[username][bookId] = {
+        chapterIndex: chapterIndex,
+        chapterId: chapterId || null,
+        updatedAt: Date.now()
+    };
+    saveAllReadingProgress(all);
+}
+
+function removeReadingProgress(username, bookId) {
+    if (!username || !bookId) return;
+    const all = getAllReadingProgress();
+    if (all[username] && all[username][bookId]) {
+        delete all[username][bookId];
+        if (Object.keys(all[username]).length === 0) delete all[username];
+        saveAllReadingProgress(all);
+    }
+}
+
+function getUserReadingList(username) {
+    if (!username) return [];
+    const all = getAllReadingProgress();
+    const userProgress = all[username] || {};
+    const books = getAllBooks();
+    return Object.entries(userProgress)
+        .map(([bookId, prog]) => {
+            const book = books.find(b => b.id === bookId);
+            if (!book) return null;
+            const total = book.chaptersCount || 1;
+            const idx = Math.min(prog.chapterIndex || 0, total - 1);
+            const percent = Math.round(((idx + 1) / total) * 100);
+            return {
+                book,
+                chapterIndex: idx,
+                chapterTitle: '—',
+                totalChapters: total,
+                percent,
+                updatedAt: prog.updatedAt || 0
+            };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+/* ====================== ОНЛАЙН-СТАТУС ====================== */
+function getLastSeen() { return load(KEYS.lastSeen, {}); }
+function saveLastSeen(ls) { save(KEYS.lastSeen, ls); }
+function touchLastSeen(username) {
+    const ls = getLastSeen();
+    ls[username] = Date.now();
+    saveLastSeen(ls);
+}
+function isUserOnline(username) {
+    const ls = getLastSeen();
+    if (!ls[username]) return false;
+    return Date.now() - ls[username] < 2 * 60 * 1000;
+}
+function getOnlineCount() {
+    const users = getUsers();
+    return Object.keys(users).filter(u => isUserOnline(u)).length;
+}
+
+/* ====================== ЧАТЫ (временно localStorage) ====================== */
+function getAllChats() { return load(KEYS.chats, {}); }
+function saveAllChats(c) { save(KEYS.chats, c); }
+function getAllMessages() { return load(KEYS.messages, {}); }
+function saveAllMessages(m) { save(KEYS.messages, m); }
+function makeChatId(a, b) { return 'dm_' + [a, b].sort().join('__'); }
+async function getOrCreateDM(userA, userB) {
+    // userA — username текущего, userB — username собеседника
+    const target = _usersCache[userB];
+    if (!target || !target.id) {
+        // fallback на localStorage, если не нашли id
+        const chats = getAllChats();
+        const id = makeChatId(userA, userB);
+        if (!chats[id]) {
+            chats[id] = { id, type: 'dm', members: [userA, userB].sort(), createdAt: Date.now(), lastMessageAt: Date.now() };
+            saveAllChats(chats);
+        }
+        return chats[id];
+    }
+    const chatId = await apiOpenDM(target.id);
+    // Обновляем локальный кэш чатов
+    const chats = getAllChats();
+    if (!chats[chatId]) {
+        chats[chatId] = {
+            id: chatId,
+            type: 'dm',
+            members: [userA, userB].sort(),
+            createdAt: Date.now(),
+            lastMessageAt: Date.now()
+        };
+        saveAllChats(chats);
+    }
+    return chats[chatId];
+}
+function getOrCreateCommunityChat(communityId) {
+    const chats = getAllChats();
+    const id = 'comm_' + communityId;
+    if (!chats[id]) {
+        chats[id] = { id, type: 'community', communityId, members: [], createdAt: Date.now(), lastMessageAt: Date.now() };
+        saveAllChats(chats);
+    }
+    return chats[id];
+}
+function sendMessage(chatId, from, text) {
+    text = text.trim();
+    if (!text) return;
+    const messages = getAllMessages();
+    if (!messages[chatId]) messages[chatId] = [];
+    messages[chatId].push({
+        id: 'm' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        from, text, at: Date.now()
+    });
+    saveAllMessages(messages);
+    const chats = getAllChats();
+    if (chats[chatId]) { chats[chatId].lastMessageAt = Date.now(); saveAllChats(chats); }
+}
+function getMessages(chatId) { return getAllMessages()[chatId] || []; }
+function getLastReads() { return load(KEYS.lastReads, {}); }
+function saveLastReads(lr) { save(KEYS.lastReads, lr); }
+function getLastRead(username, chatId) {
+    const lr = getLastReads();
+    return (lr[username] && lr[username][chatId]) || 0;
+}
+function markChatRead(username, chatId) {
+    const lr = getLastReads();
+    if (!lr[username]) lr[username] = {};
+    lr[username][chatId] = Date.now();
+    saveLastReads(lr);
+}
+function getUnreadCount(username, chatId) {
+    const msgs = getMessages(chatId);
+    const lastRead = getLastRead(username, chatId);
+    return msgs.filter(m => m.at > lastRead && m.from !== username).length;
+}
+function getTotalUnread(username) {
+    const chats = getAllChats();
+    let total = 0;
+    Object.keys(chats).forEach(id => {
+        const c = chats[id];
+        if (c.type === 'general' || c.type === 'community' || (c.members && c.members.includes(username))) {
+            if (c.type === 'community') {
+                const comm = getCommunity(c.communityId);
+                if (!comm || !comm.members.includes(username)) return;
+            }
+            total += getUnreadCount(username, id);
+        }
+    });
+    return total;
+}
+
+function getOrCreateGeneralChat() {
+    const chats = getAllChats();
+    if (!chats.general) {
+        chats.general = { id: 'general', type: 'general', members: [], createdAt: Date.now(), lastMessageAt: Date.now() };
+        saveAllChats(chats);
+    }
+    return chats.general;
+}
+
+function getOrCreateCommunityChat(communityId) {
+    const chats = getAllChats();
+    const id = 'comm_' + communityId;
+    if (!chats[id]) {
+        chats[id] = { id, type: 'community', communityId, members: [], createdAt: Date.now(), lastMessageAt: Date.now() };
+        saveAllChats(chats);
+    }
+    return chats[id];
+}
+
+/* ====================== ДРУЗЬЯ (через API + кэш) ====================== */
+function getAllFriends() {
+    return _friendsCache;
+}
+
+function getFriendsData(username) {
+    return _friendsCache;
+}
+
+function ensureFriendsData() {
+    return _friendsCache;
+}
+
+function getFriendsCount(username) {
+    if (!getCurrentUser()) return 0;
+    return _friendsCache.friends.length;
+}
+
+function getIncomingCount(username) {
+    if (!getCurrentUser()) return 0;
+    return _friendsCache.incoming.length;
+}
+
+function getFriendStatus(me, other) {
+    if (!me || me === other) return 'none';
+    const f = _friendsCache.friends.map(u => u.username);
+    const inc = _friendsCache.incoming.map(u => u.username);
+    const out = _friendsCache.outgoing.map(u => u.username);
+    if (f.includes(other)) return 'friends';
+    if (out.includes(other)) return 'outgoing';
+    if (inc.includes(other)) return 'incoming';
+    return 'none';
+}
+
+/* ====================== ТЕМА ====================== */
+function applyTheme(theme) {
+    document.body.className = theme || 'theme-steel';
+    try { localStorage.setItem(KEYS.theme, theme); } catch(e){}
+}
+applyTheme(localStorage.getItem(KEYS.theme) || 'theme-steel');
+
+/* ====================== СООБЩЕСТВА (через API + кэш) ====================== */
+function getAllCommunities() {
+    // Возвращает объект { id: community } для совместимости со старым кодом
+    const obj = {};
+    _communitiesCache.forEach(c => { obj[c.id] = c; });
+    return obj;
+}
+
+function getCommunity(id) {
+    return _communitiesCache.find(c => c.id === id) || null;
+}
+
+function getCommunitiesCount() {
+    return _communitiesCache.length;
+}
+
+async function getMyCommunities(username) {
+    if (!getCurrentUser()) return [];
+    return await loadMyCommunitiesCache();
+}
+
+function findCommunityByUsername(handle) {
+    if (!handle) return null;
+    const lower = handle.replace(/^@/, '').toLowerCase();
+    return _communitiesCache.find(c => c.username && c.username.toLowerCase() === lower) || null;
+}
+
+function isCommunityUsernameTaken(handle, exceptId) {
+    if (!handle) return false;
+    const lower = handle.toLowerCase();
+    return _communitiesCache.some(c => {
+        if (exceptId && c.id === exceptId) return false;
+        return c.username && c.username.toLowerCase() === lower;
+    });
+}
+
+// Заглушки для совместимости (не используются)
+function saveAllCommunities() {}
+function createCommunity() {}
+function joinCommunity() {}
+function leaveCommunity() {}
+
+/* ====================== УВЕДОМЛЕНИЯ ====================== */
+function showToast(text, type = '') {
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.textContent = text;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 2600);
+}
+
+/* ====================== СЧЁТЧИКИ ====================== */
+function updateBookCounter() {
+    const counter = document.getElementById('topCounter');
+    if (!counter) return;
+    const n = getBooksCount();
+    counter.textContent = n + ' ' + plural(n, 'книга', 'книги', 'книг');
+}
+function plural(n, one, few, many) {
+    const mod10 = n % 10, mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return one;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+    return many;
+}
+
+/* ====================== АВАТАР ====================== */
+function avatarHTML(user, size = 'md') {
+    if (typeof user === 'string') {
+        const users = getUsers();
+        user = users[user] ? { username: user, ...users[user] } : { username: user };
+    }
+    if (!user) return `<div class="avatar size-${size}">?</div>`;
+    const initial = (user.displayName || user.username || '?').charAt(0).toUpperCase();
+    const online = isUserOnline(user.username);
+    const googleClass = user.google ? ' google' : '';
+    if (user.avatar) {
+        return `<div class="avatar size-${size}${googleClass}"><img src="${escapeAttr(user.avatar)}" alt=""><span class="status-dot ${online ? 'online' : ''}"></span></div>`;
+    }
+    return `<div class="avatar size-${size}${googleClass}">${initial}<span class="status-dot ${online ? 'online' : ''}"></span></div>`;
+}
+
+/* ====================== РОУТЕР ====================== */
+let currentPage = 'home';
+let currentBookId = null;
+let currentChatId = null;
+let currentProfileUser = null;
+let currentCommunityId = null;
+let currentCommunityTab = 'chat';
+let chatTab = 'dialogs';
+let friendsTab = 'friends';
+let navData = {};
+
+async function navigate(page, data = {}) {
+    currentPage = page;
+    navData = data;
+    document.querySelectorAll('.nav-link').forEach(l => {
+        l.classList.toggle('active', l.dataset.page === page);
+    });
+    await render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ====================== ШАПКА ====================== */
+function renderTopbarUser() {
+    const box = document.getElementById('topbarActions');
+    const user = getCurrentUser();
+    const onlineCount = getOnlineCount();
+    const friendRequests = user ? getIncomingCount(user.username) : 0;
+    box.innerHTML = `
+        <button class="icon-btn" id="usersBtn" title="Пользователи">
+            ☺
+            ${onlineCount > 0 ? `<span class="online-dot">${onlineCount}</span>` : ''}
+        </button>
+        <button class="icon-btn" id="friendsBtn" title="Друзья">
+            ♥
+            ${friendRequests > 0 ? `<span class="friend-dot">${friendRequests}</span>` : ''}
+        </button>
+        <button class="icon-btn" id="themeBtn" title="Сменить тему">◐</button>
+        ${user ? `
+            <button class="user-chip" id="userChip">
+                ${avatarHTML(user, 'sm')}
+                <span>${escapeHtml(displayName(user))}</span>
+            </button>
+            <button class="icon-btn" id="logoutBtn" title="Выйти">
+                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 27v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h15a1 1 0 0 1 1 1v2"/>
+                    <path d="M24 10l6 6-6 6"/>
+                    <path d="M14 16h16"/>
+                </svg>
+            </button>
+        ` : `
+            <button class="btn btn-ghost" id="loginBtn">Войти</button>
+            <button class="btn btn-primary" id="registerBtn">Регистрация</button>
+        `}
+    `;
+    document.getElementById('usersBtn').addEventListener('click', () => togglePanel('usersPanel', 'usersBackdrop'));
+    document.getElementById('friendsBtn').addEventListener('click', () => {
+        if (!user) { openAuth('login'); return; }
+        togglePanel('friendsPanel', 'friendsBackdrop');
+    });
+    document.getElementById('themeBtn').addEventListener('click', () => {
+        const order = ['theme-steel', 'light', 'night'];
+        const idx = order.indexOf(localStorage.getItem(KEYS.theme) || 'theme-steel');
+        applyTheme(order[(idx + 1) % order.length]);
+        renderTopbarUser();
+    });
+    if (user) {
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            openLogoutConfirm();
+        });
+        document.getElementById('userChip').addEventListener('click', () => {
+            currentProfileUser = user.username;
+            navigate('profile');
+        });
+    } else {
+        document.getElementById('loginBtn').addEventListener('click', () => openAuth('login'));
+        document.getElementById('registerBtn').addEventListener('click', () => openAuth('register'));
+    }
+    updateBookCounter();
+}
+
+function updateUnreadBadge() {
+    const user = getCurrentUser();
+    const badge = document.getElementById('unreadBadge');
+    if (!badge) return;
+    if (!user) { badge.style.display = 'none'; return; }
+    const total = getTotalUnread(user.username);
+    if (total > 0) { badge.textContent = total; badge.style.display = 'inline-block'; }
+    else { badge.style.display = 'none'; }
+}
+
+/* ====================== УПРАВЛЕНИЕ ПАНЕЛЯМИ ====================== */
+function togglePanel(panelId, backdropId) {
+    const panel = document.getElementById(panelId);
+    const backdrop = document.getElementById(backdropId);
+    const isOpen = panel.classList.contains('open');
+    if (isOpen) {
+        panel.classList.remove('open');
+        backdrop.classList.remove('active');
+    } else {
+        document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
+        document.querySelectorAll('.side-backdrop').forEach(b => b.classList.remove('active'));
+        if (panelId === 'usersPanel') renderUsersPanel();
+        if (panelId === 'friendsPanel') renderFriendsPanel();
+        panel.classList.add('open');
+        backdrop.classList.add('active');
+    }
+}
+function closeAllPanels() {
+    document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.side-backdrop').forEach(b => b.classList.remove('active'));
+}
+
+document.getElementById('usersPanelClose').addEventListener('click', closeAllPanels);
+document.getElementById('friendsPanelClose').addEventListener('click', closeAllPanels);
+document.getElementById('usersBackdrop').addEventListener('click', closeAllPanels);
+document.getElementById('friendsBackdrop').addEventListener('click', closeAllPanels);
+
+document.querySelectorAll('.side-panel-tab[data-ftab]').forEach(t => {
+    t.addEventListener('click', () => {
+        friendsTab = t.dataset.ftab;
+        document.querySelectorAll('.side-panel-tab[data-ftab]').forEach(x => x.classList.toggle('active', x === t));
+        renderFriendsPanel();
+    });
+});
+
+/* ====================== ПАНЕЛЬ ПОЛЬЗОВАТЕЛЕЙ ====================== */
+document.getElementById('usersSearch').addEventListener('input', renderUsersPanel);
+
+function renderUsersPanel() {
+    const body = document.getElementById('usersPanelBody');
+    const counter = document.getElementById('usersCounter');
+    if (!body) return;
+    const users = getUsers();
+    const me = getCurrentUser();
+    const search = (document.getElementById('usersSearch').value || '').trim().toLowerCase();
+    let names = Object.keys(users);
+    if (search) {
+        names = names.filter(u => {
+            const data = users[u];
+            return u.toLowerCase().includes(search) ||
+                (data.handle && data.handle.toLowerCase().includes(search.replace('@',''))) ||
+                (data.displayName && data.displayName.toLowerCase().includes(search));
+        });
+    }
+
+    names.sort((a, b) => {
+        const aOnline = isUserOnline(a);
+        const bOnline = isUserOnline(b);
+        if (aOnline && !bOnline) return -1;
+        if (!aOnline && bOnline) return 1;
+        return (users[a].displayName || a).localeCompare(users[b].displayName || b);
+    });
+
+    const onlineCount = Object.keys(users).filter(u => isUserOnline(u)).length;
+    counter.innerHTML = `Всего: ${Object.keys(users).length} · <span class="online-num">${onlineCount} в сети</span>`;
+
+    if (!names.length) {
+        body.innerHTML = `<div class="side-panel-empty">${search ? 'Никого не найдено' : 'Пока нет пользователей'}</div>`;
+        return;
+    }
+
+    body.innerHTML = names.map(u => userCardHTML(u, users[u], me)).join('');
+    attachUserCardHandlers(body);
+}
+
+function userCardHTML(username, data, me) {
+    const isMe = me && username === me.username;
+    const online = isUserOnline(username);
+    const friendStatus = getFriendStatus(me ? me.username : null, username);
+    const booksCount = getAllBooks().filter(b => b.author === username).length;
+    const handle = data.handle ? '@' + data.handle : '@' + username.toLowerCase();
+
+    let actionBtn = '';
+    if (isMe) {
+        actionBtn = `<button class="user-card-write" data-action="edit-me">Редактировать</button>`;
+    } else if (friendStatus === 'friends') {
+        actionBtn = `<button class="user-card-write danger" data-action="unfriend" data-user="${escapeAttr(username)}">В друзьях</button>`;
+    } else if (friendStatus === 'outgoing') {
+        actionBtn = `<button class="user-card-write" data-action="cancel-outgoing" data-user="${escapeAttr(username)}">Заявка отправлена</button>`;
+    } else if (friendStatus === 'incoming') {
+        actionBtn = `<button class="user-card-write success" data-action="accept-friend" data-user="${escapeAttr(username)}">Принять</button>`;
+    } else if (me) {
+        actionBtn = `<button class="user-card-write" data-action="add-friend" data-user="${escapeAttr(username)}">+ В друзья</button>`;
+    }
+
+    return `
+        <div class="user-card" data-user="${escapeAttr(username)}">
+            ${avatarHTML({ username, ...data }, 'md')}
+            <div class="user-card-info">
+                <div class="user-card-name">
+                    ${escapeHtml(displayName({ username, ...data }))}
+                    ${isMe ? '<span class="me-tag" style="font-size:.65rem;color:var(--accent)">— это вы</span>' : ''}
+                </div>
+                <div class="user-card-username">${escapeHtml(handle)}</div>
+                <div class="user-card-status ${online ? 'online' : ''}">${online ? 'в сети' : 'не в сети'} · ${booksCount} ${plural(booksCount, 'книга', 'книги', 'книг')}</div>
+            </div>
+            <div class="user-card-actions">
+                ${!isMe && me ? `<button class="user-card-write" data-action="write" data-user="${escapeAttr(username)}">Написать</button>` : ''}
+                ${actionBtn}
+            </div>
+        </div>
+    `;
+}
+
+function friendCardHTML(user, mode) {
+    let username, data;
+    if (typeof user === 'string') {
+        username = user;
+        data = _usersCache[user] || { username, displayName: user, handle: user };
+    } else {
+        username = user.username;
+        data = user;
+    }
+
+    const online = isUserOnline(username);
+    const handle = '@' + (data.handle || username);
+    const display = data.displayName || username;
+
+    let actions = '';
+    if (mode === 'friend') {
+        actions = `
+            <button class="user-card-write" data-faction="write" data-user="${escapeAttr(username)}">Написать</button>
+            <button class="user-card-write danger" data-faction="unfriend" data-user="${escapeAttr(username)}">Удалить</button>
+        `;
+    } else if (mode === 'incoming') {
+        actions = `
+            <button class="user-card-write success" data-faction="accept" data-user="${escapeAttr(username)}">Принять</button>
+            <button class="user-card-write danger" data-faction="decline" data-user="${escapeAttr(username)}">Отклонить</button>
+        `;
+    } else {
+        actions = `
+            <button class="user-card-write" data-faction="cancel" data-user="${escapeAttr(username)}">Отозвать</button>
+        `;
+    }
+
+    return `
+        <div class="user-card" data-user="${escapeAttr(username)}">
+            ${avatarHTML({ username, ...data }, 'md')}
+            <div class="user-card-info">
+                <div class="user-card-name">${escapeHtml(display)}</div>
+                <div class="user-card-username">${escapeHtml(handle)}</div>
+                <div class="user-card-status ${online ? 'online' : ''}">${online ? 'в сети' : 'не в сети'}</div>
+            </div>
+            <div class="user-card-actions">${actions}</div>
+        </div>
+    `;
+}
+
+function attachUserCardHandlers(container) {
+    container.querySelectorAll('.user-card').forEach(card => {
+        const username = card.dataset.user;
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            currentProfileUser = username;
+            closeAllPanels();
+            navigate('profile');
+        });
+    });
+    container.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const action = btn.dataset.action;
+            const target = btn.dataset.user;
+            const me = getCurrentUser();
+            handleUserAction(action, target, me);
+        });
+    });
+}
+
+async function handleUserAction(action, target, me) {
+    if (!me) { openAuth('login'); return; }
+    const meUsername = me.username;
+
+    if (action === 'write') {
+        const chat = await getOrCreateDM(me.username, target);
+        currentChatId = chat.id;
+        chatTab = 'dialogs';
+        closeAllPanels();
+        navigate('messages', { chatId: chat.id });
+        return;
+    }
+
+    // Находим target в кэше
+    const targetUser = _usersCache[target];
+    const targetId = targetUser ? targetUser.id : target;
+
+    try {
+        if (action === 'add-friend') {
+            const r = await apiSendFriendRequest(targetId);
+            showToast(r.msg || 'Заявка отправлена', 'success');
+        } else if (action === 'accept-friend') {
+            await apiAcceptFriend(targetId);
+            showToast('Заявка принята', 'success');
+        } else if (action === 'unfriend') {
+            if (!confirm('Удалить из друзей?')) return;
+            await apiRemoveFriend(targetId);
+            showToast('Удалён из друзей', 'success');
+        } else if (action === 'cancel-outgoing') {
+            // Отмена отправленной — это тоже удаление связи
+            await apiRemoveFriend(targetId);
+            showToast('Заявка отозвана', 'success');
+        } else if (action === 'edit-me') {
+            closeAllPanels();
+            openEditProfile();
+            return;
+        }
+        await loadFriendsData();
+        await loadUsersCache();
+        renderUsersPanel();
+        renderFriendsPanel();
+        renderTopbarUser();
+    } catch(e) {
+        showToast('Ошибка: ' + e.message, 'error');
+    }
+}
+
+/* ====================== ПАНЕЛЬ ДРУЗЕЙ ====================== */
+document.getElementById('friendsSearch').addEventListener('input', renderFriendsPanel);
+
+function renderFriendsPanel() {
+    const body = document.getElementById('friendsPanelBody');
+    const counter = document.getElementById('friendsCounter');
+    const me = getCurrentUser();
+    if (!body || !me) return;
+
+    const data = _friendsCache;
+    const friendsCount = data.friends.length;
+    const incomingCount = data.incoming.length;
+
+    const onlineFriends = data.friends.filter(u => isUserOnline(u.username)).length;
+    counter.innerHTML = `Друзей: ${friendsCount} · <span class="online-num">${onlineFriends} в сети</span>`;
+
+    const fBadge = document.getElementById('friendsCountBadge');
+    const iBadge = document.getElementById('incomingCountBadge');
+    if (friendsCount > 0) { fBadge.textContent = friendsCount; fBadge.style.display = 'inline-block'; }
+    else fBadge.style.display = 'none';
+    if (incomingCount > 0) { iBadge.textContent = incomingCount; iBadge.style.display = 'inline-block'; }
+    else iBadge.style.display = 'none';
+
+    const search = (document.getElementById('friendsSearch').value || '').trim().toLowerCase();
+
+    let list = [];
+    if (friendsTab === 'friends') list = data.friends;
+    else if (friendsTab === 'incoming') list = data.incoming;
+    else if (friendsTab === 'outgoing') list = data.outgoing;
+
+    if (search) {
+        list = list.filter(u => {
+            const uname = typeof u === 'string' ? u : (u.username || '');
+            const dname = typeof u === 'string' ? u : (u.displayName || u.username || '');
+            return uname.toLowerCase().includes(search) || dname.toLowerCase().includes(search);
+        });
+    }
+
+    list.sort((a, b) => {
+        const aO = isUserOnline(typeof a === 'string' ? a : a.username);
+        const bO = isUserOnline(typeof b === 'string' ? b : b.username);
+        if (aO && !bO) return -1;
+        if (!aO && bO) return 1;
+        const aN = typeof a === 'string' ? a : (a.displayName || a.username || '');
+        const bN = typeof b === 'string' ? b : (b.displayName || b.username || '');
+        return aN.localeCompare(bN);
+    });
+
+    if (!list.length) {
+        let emptyMsg = 'Пусто';
+        if (friendsTab === 'friends') emptyMsg = search ? 'Не найдено' : 'У вас пока нет друзей. Найдите их в панели пользователей!';
+        if (friendsTab === 'incoming') emptyMsg = 'Нет входящих заявок';
+        if (friendsTab === 'outgoing') emptyMsg = 'Нет отправленных заявок';
+        body.innerHTML = `<div class="side-panel-empty">${emptyMsg}</div>`;
+        return;
+    }
+
+    let html = '';
+    if (friendsTab === 'friends') {
+        const online = list.filter(u => isUserOnline(typeof u === 'string' ? u : u.username));
+        const offline = list.filter(u => !isUserOnline(typeof u === 'string' ? u : u.username));
+        if (online.length) {
+            html += `<div class="users-section-label online-label">● В сети — ${online.length}</div>`;
+            html += online.map(u => friendCardHTML(u, 'friend')).join('');
+        }
+        if (offline.length) {
+            html += `<div class="users-section-label">Не в сети — ${offline.length}</div>`;
+            html += offline.map(u => friendCardHTML(u, 'friend')).join('');
+        }
+    } else if (friendsTab === 'incoming') {
+        html = list.map(u => friendCardHTML(u, 'incoming')).join('');
+    } else {
+        html = list.map(u => friendCardHTML(u, 'outgoing')).join('');
+    }
+    body.innerHTML = html;
+
+    body.querySelectorAll('.user-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            currentProfileUser = card.dataset.user;
+            closeAllPanels();
+            navigate('profile');
+        });
+    });
+
+    body.querySelectorAll('[data-faction]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const action = btn.dataset.faction;
+            const target = btn.dataset.user;
+            const me2 = getCurrentUser();
+            if (!me2) return;
+
+            const targetUser = _usersCache[target];
+            const targetId = targetUser ? targetUser.id : target;
+
+    if (action === 'write') {
+        const chat = await getOrCreateDM(me.username, target);
+        currentChatId = chat.id;
+        chatTab = 'dialogs';
+        closeAllPanels();
+        navigate('messages', { chatId: chat.id });
+        return;
+    }
+
+            try {
+                if (action === 'accept') {
+                    await apiAcceptFriend(targetId);
+                    showToast('Заявка принята', 'success');
+                } else if (action === 'decline') {
+                    await apiDeclineFriend(targetId);
+                    showToast('Заявка отклонена', 'success');
+                } else if (action === 'unfriend') {
+                    if (!confirm('Удалить из друзей?')) return;
+                    await apiRemoveFriend(targetId);
+                    showToast('Удалён из друзей', 'success');
+                } else if (action === 'cancel') {
+                    await apiRemoveFriend(targetId);
+                    showToast('Заявка отозвана', 'success');
+                }
+                await loadFriendsData();
+                await loadUsersCache();
+                renderFriendsPanel();
+                renderUsersPanel();
+                renderTopbarUser();
+            } catch(err) {
+                showToast('Ошибка: ' + err.message, 'error');
+            }
+        });
+    });
+}
+
+/* ====================== АВТОРИЗАЦИЯ UI ====================== */
+function openAuth(tab) {
+    document.getElementById('authOverlay').classList.add('active');
+    switchTab(tab);
+}
+function closeAuth() {
+    document.getElementById('authOverlay').classList.remove('active');
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('regError').textContent = '';
+    document.getElementById('loginForm').reset();
+    document.getElementById('registerForm').reset();
+}
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+}
+document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => switchTab(t.dataset.tab));
+});
+document.querySelectorAll('[data-close]').forEach(b => {
+    b.addEventListener('click', () => document.getElementById(b.dataset.close).classList.remove('active'));
+});
+['authOverlay', 'googleOverlay', 'rulesOverlay', 'editProfileOverlay', 'newCommunityOverlay', 'logoutOverlay', 'deleteAccountOverlay'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', e => { if (e.target.id === id) e.currentTarget.classList.remove('active'); });
+});
+
+/* ====================== МОДАЛКА ВЫХОДА ====================== */
+function openLogoutConfirm() {
+    const me = getCurrentUser();
+    if (!me) return;
+    const box = document.getElementById('logoutUserBox');
+    box.innerHTML = `
+        ${avatarHTML(me, 'lg')}
+        <div style="flex:1; min-width:0">
+            <div style="font-family:var(--font-head); font-size:1rem; color:var(--text); letter-spacing:.5px; margin-bottom:2px">${escapeHtml(displayName(me))}</div>
+            <div style="font-size:.8rem; color:var(--accent); font-family:var(--font-head); letter-spacing:.5px">@${escapeHtml(me.handle || me.username)}</div>
+            ${me.email ? `<div style="font-size:.75rem; color:var(--text3); font-style:italic; margin-top:2px">${escapeHtml(me.email)}</div>` : ''}
+        </div>
+    `;
+    document.getElementById('logoutOverlay').classList.add('active');
+}
+
+document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
+    await apiLogout();
+    document.getElementById('logoutOverlay').classList.remove('active');
+    showToast('Вы вышли из аккаунта');
+    currentChatId = null;
+    currentProfileUser = null;
+    renderTopbarUser();
+    updateUnreadBadge();
+    if (document.getElementById('friendsPanel').classList.contains('open')) renderFriendsPanel();
+    navigate('home');
+});
+
+document.getElementById('registerForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = document.getElementById('regUser').value.trim();
+    const handle = document.getElementById('regUsername').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const p1 = document.getElementById('regPass').value;
+    const p2 = document.getElementById('regPass2').value;
+    const err = document.getElementById('regError');
+    err.textContent = '';
+    if (name.length < 2) { err.textContent = 'Имя не короче 2 символов'; return; }
+    if (!isValidUsername(handle)) { err.textContent = '@юзернейм: 2-20 символов, латиница, цифры, _'; return; }
+    if (!isValidEmail(email)) { err.textContent = 'Введите корректный email'; return; }
+    if (p1.length < 4) { err.textContent = 'Пароль не короче 4 символов'; return; }
+    if (p1 !== p2) { err.textContent = 'Пароли не совпадают'; return; }
+
+    try {
+        await apiRegister({
+            username: handle.toLowerCase(),
+            email,
+            password: p1,
+            displayName: name,
+        });
+        await loadUsersCache();
+        await loadFriendsData();
+        closeAuth();
+        showToast('Аккаунт создан! Добро пожаловать, ' + name + '!', 'success');
+        renderTopbarUser();
+        updateUnreadBadge();
+        navigate('profile', { username: getCurrentUser().username });
+    } catch(ex) {
+        err.textContent = ex.message || 'Ошибка регистрации';
+    }
+});
+
+document.getElementById('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const login = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    const err = document.getElementById('loginError');
+    err.textContent = '';
+    if (!login) { err.textContent = 'Введите логин'; return; }
+    if (!pass) { err.textContent = 'Введите пароль'; return; }
+
+    try {
+        await apiLogin({ login, password: pass });
+        closeAuth();
+        showToast('С возвращением, ' + displayName(getCurrentUser()) + '!', 'success');
+        renderTopbarUser();
+        updateUnreadBadge();
+        navigate('home');
+    } catch(ex) {
+        err.textContent = ex.message || 'Неверный логин или пароль';
+    }
+});
+
+document.getElementById('googleBtn').addEventListener('click', () => {
+    closeAuth();
+    document.getElementById('googleOverlay').classList.add('active');
+});
+document.getElementById('googleForm').addEventListener('submit', e => {
+    e.preventDefault();
+    showToast('Вход через Google пока не подключён', 'error');
+    document.getElementById('googleOverlay').classList.remove('active');
+});
+
+/* ====================== РЕДАКТИРОВАНИЕ ПРОФИЛЯ ====================== */
+let editProfileAvatarData = null;
+
+function openEditProfile() {
+    const me = getCurrentUser();
+    if (!me) return;
+    document.getElementById('editDisplayName').value = me.displayName || me.username;
+    document.getElementById('editUsername').value = me.handle || me.username;
+    document.getElementById('editBio').value = me.bio || '';
+    document.getElementById('bioCount').textContent = (me.bio || '').length;
+    editProfileAvatarData = me.avatar || null;
+    renderAvatarPreview();
+    document.getElementById('editProfileError').textContent = '';
+    document.getElementById('editProfileOverlay').classList.add('active');
+}
+
+function renderAvatarPreview() {
+    const preview = document.getElementById('avatarPreview');
+    if (!preview) return;
+    if (editProfileAvatarData) {
+        preview.innerHTML = `<img src="${escapeAttr(editProfileAvatarData)}" alt="">`;
+    } else {
+        const me = getCurrentUser();
+        const initial = (me?.displayName || me?.username || '?').charAt(0).toUpperCase();
+        preview.textContent = initial;
+    }
+}
+
+document.getElementById('avatarChooseBtn').addEventListener('click', () => {
+    document.getElementById('avatarInput').click();
+});
+document.getElementById('avatarInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { showToast('Файл слишком большой (макс 2 МБ)', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        editProfileAvatarData = ev.target.result;
+        renderAvatarPreview();
+    };
+    reader.readAsDataURL(file);
+});
+document.getElementById('avatarRemoveBtn').addEventListener('click', () => {
+    editProfileAvatarData = null;
+    renderAvatarPreview();
+});
+document.getElementById('editBio').addEventListener('input', (e) => {
+    document.getElementById('bioCount').textContent = e.target.value.length;
+});
+
+document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    showToast('Редактирование профиля — в следующем этапе', 'error');
+    document.getElementById('editProfileOverlay').classList.remove('active');
+});
+
+/* ====================== УДАЛЕНИЕ АККАУНТА ====================== */
+document.getElementById('deleteAccountBtn').addEventListener('click', () => {
+    showToast('Удаление аккаунта — в следующем этапе', 'error');
+});
+
+/* ====================== СОЗДАНИЕ СООБЩЕСТВА ====================== */
+let communityAvatarData = null;
+
+document.getElementById('communityAvatarChooseBtn').addEventListener('click', () => {
+    document.getElementById('communityAvatarInput').click();
+});
+document.getElementById('communityAvatarInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { showToast('Файл слишком большой (макс 2 МБ)', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        communityAvatarData = ev.target.result;
+        const preview = document.getElementById('communityAvatarPreview');
+        preview.innerHTML = `<img src="${escapeAttr(communityAvatarData)}" alt="">`;
+    };
+    reader.readAsDataURL(file);
+});
+document.getElementById('communityAvatarRemoveBtn').addEventListener('click', () => {
+    communityAvatarData = null;
+    const preview = document.getElementById('communityAvatarPreview');
+    preview.textContent = '#';
+});
+document.getElementById('communityDesc').addEventListener('input', (e) => {
+    document.getElementById('communityDescCount').textContent = e.target.value.length;
+});
+
+document.getElementById('newCommunityForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const me = getCurrentUser();
+    if (!me) { openAuth('login'); return; }
+    const title = document.getElementById('communityTitle').value.trim();
+    const username = document.getElementById('communityUsername').value.trim();
+    const desc = document.getElementById('communityDesc').value.trim();
+    const err = document.getElementById('newCommunityError');
+    err.textContent = '';
+    if (title.length < 3) { err.textContent = 'Название не короче 3 символов'; return; }
+    if (!isValidCommunityUsername(username)) { err.textContent = '@юзернейм: 3-24 символа, латиница, цифры, _'; return; }
+    if (isCommunityUsernameTaken(username)) { err.textContent = 'Такой @юзернейм сообщества уже занят'; return; }
+    if (desc.length < 20) { err.textContent = 'Описание не короче 20 символов'; return; }
+
+    let avatarUrl = null;
+    if (communityAvatarData && communityAvatarData.startsWith('data:')) {
+        try {
+            const blob = await (await fetch(communityAvatarData)).blob();
+            const file = new File([blob], 'avatar.jpg', { type: blob.type });
+            const up = await apiUploadImage(file);
+            avatarUrl = up.url;
+        } catch (ex) {
+            err.textContent = 'Ошибка загрузки аватара: ' + ex.message;
+            return;
+        }
+    }
+
+    try {
+        const comm = await apiCreateCommunity({
+            title,
+            username: username.toLowerCase(),
+            description: desc,
+            avatarUrl,
+        });
+        await loadCommunitiesCache();
+        document.getElementById('newCommunityOverlay').classList.remove('active');
+        document.getElementById('newCommunityForm').reset();
+        document.getElementById('communityAvatarPreview').textContent = '#';
+        communityAvatarData = null;
+        showToast('Сообщество создано!', 'success');
+        currentCommunityId = comm.id;
+        navigate('community', { communityId: comm.id });
+    } catch(ex) {
+        err.textContent = ex.message || 'Ошибка создания';
+    }
+});
+
+/* ====================== ГЛОБАЛЬНЫЙ ПОИСК ====================== */
+const globalSearchInput = document.getElementById('globalSearchInput');
+const globalSearchResults = document.getElementById('globalSearchResults');
+
+globalSearchInput.addEventListener('input', () => {
+    const q = globalSearchInput.value.trim().toLowerCase();
+    if (q.length < 2) { globalSearchResults.classList.remove('active'); return; }
+    const results = [];
+    const users = getUsers();
+    const books = getAllBooks();
+    const communities = getAllCommunities();
+
+    Object.entries(users).forEach(([u, data]) => {
+        const handle = data.handle || u;
+        if (handle.toLowerCase().includes(q.replace('@','')) ||
+            u.toLowerCase().includes(q) ||
+            (data.displayName && data.displayName.toLowerCase().includes(q))) {
+            results.push({
+                type: 'Пользователь',
+                title: displayName({ username: u, ...data }),
+                sub: '@' + handle,
+                onClick: () => { currentProfileUser = u; closeAllPanels(); navigate('profile'); }
+            });
+        }
+    });
+    books.forEach(b => {
+        if (b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)) {
+            results.push({
+                type: 'Книга', title: b.title, sub: b.author,
+                onClick: () => { currentBookId = b.id; navigate('book'); }
+            });
+        }
+    });
+    Object.values(communities).forEach(c => {
+        if (c.title.toLowerCase().includes(q) || c.username.toLowerCase().includes(q)) {
+            results.push({
+                type: 'Сообщество', title: c.title, sub: '@' + c.username,
+                onClick: () => { currentCommunityId = c.id; navigate('community'); }
+            });
+        }
+    });
+
+    if (!results.length) {
+        globalSearchResults.innerHTML = `<div class="search-result" style="cursor:default;color:var(--text3);font-style:italic">Ничего не найдено</div>`;
+        globalSearchResults.classList.add('active');
+        return;
+    }
+
+    globalSearchResults.innerHTML = results.slice(0, 20).map((r, i) => `
+        <div class="search-result" data-idx="${i}">
+            <div style="flex:1;min-width:0">
+                <div style="font-family:var(--font-head);color:var(--text);font-size:.9rem">${escapeHtml(r.title)}</div>
+                <div style="font-size:.75rem;color:var(--text3);font-style:italic">${escapeHtml(r.sub)}</div>
+            </div>
+            <div class="search-result-type">${r.type}</div>
+        </div>
+    `).join('');
+    globalSearchResults.querySelectorAll('.search-result').forEach((el, i) => {
+        el.addEventListener('click', () => {
+            results[i].onClick();
+            globalSearchResults.classList.remove('active');
+            globalSearchInput.value = '';
+        });
+    });
+    globalSearchResults.classList.add('active');
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#globalSearchWrap')) {
+        globalSearchResults.classList.remove('active');
+    }
+});
+
+/* ====================== РЕНДЕР (роутер) ====================== */
+const app = document.getElementById('app');
+
+async function render() {
+    if (currentPage === 'home') await renderHome();
+    else if (currentPage === 'catalog') await renderCatalog();
+    else if (currentPage === 'book') await renderBookPage();
+    else if (currentPage === 'reader') await renderReader();
+    else if (currentPage === 'mybooks') await renderMyBooks();
+    else if (currentPage === 'reading') await renderReadingPage();
+    else if (currentPage === 'editor') await renderEditor();
+    else if (currentPage === 'messages') renderMessages();
+    else if (currentPage === 'profile') await renderProfilePage();
+    else if (currentPage === 'communities') await renderCommunitiesPage();
+    else if (currentPage === 'community') await renderCommunityPage();
+    renderTopbarUser();
+    updateUnreadBadge();
+}
+
+/* ---------- ГЛАВНАЯ ---------- */
+async function renderHome() {
+    if (_booksCache.length === 0) {
+        await loadBooks();
+    }
+    const books = getAllBooks().slice().sort((a,b) => b.updatedAt - a.updatedAt).slice(0, 6);
+    const user = getCurrentUser();
+    const usersCount = Object.keys(getUsers()).length;
+    const booksCount = getBooksCount();
+    const onlineCount = getOnlineCount();
+    const communitiesCount = getCommunitiesCount();
+
+    app.innerHTML = `
+        <div class="container">
+            <section class="hero">
+                <h1>Северная Библиотека</h1>
+                <div class="subtitle">читай · публикуй · общайся · объединяйся</div>
+                <p>Платформа для авторов и читателей. Выкладывайте книги, заводите друзей, создавайте сообщества.</p>
+                <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap">
+                    <button class="btn btn-primary" onclick="navigate('catalog')">Открыть каталог</button>
+                    ${user ? `<button class="btn" onclick="navigate('reading')">Моё чтение</button>` : `<button class="btn" onclick="openAuth('register')">Создать аккаунт</button>`}
+                </div>
+            </section>
+            <section class="section" style="max-width:1000px; margin:0 auto">
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; text-align:center">
+                    <div class="card">
+                        <div style="font-family:var(--font-display); font-size:2rem; color:var(--accent)">${booksCount}</div>
+                        <div style="font-family:var(--font-head); font-size:.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-top:6px">${plural(booksCount, 'Книга', 'Книги', 'Книг')}</div>
+                    </div>
+                    <div class="card">
+                        <div style="font-family:var(--font-display); font-size:2rem; color:var(--accent)">${usersCount}</div>
+                        <div style="font-family:var(--font-head); font-size:.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-top:6px">Авторов</div>
+                    </div>
+                    <div class="card">
+                        <div style="font-family:var(--font-display); font-size:2rem; color:var(--online)">${onlineCount}</div>
+                        <div style="font-family:var(--font-head); font-size:.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-top:6px">В сети</div>
+                    </div>
+                    <div class="card">
+                        <div style="font-family:var(--font-display); font-size:2rem; color:var(--accent)">${communitiesCount}</div>
+                        <div style="font-family:var(--font-head); font-size:.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-top:6px">Сообществ</div>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="section-head">
+                    <div class="section-title">Новинки</div>
+                    <button class="btn btn-ghost btn-sm" onclick="navigate('catalog')">Все книги →</button>
+                </div>
+                ${books.length ? `<div class="books-grid">${books.map(bookCardHTML).join('')}</div>` : `<div class="empty">Пока ни одной книги</div>`}
+            </section>
+        </div>
+        <footer class="footer"><div class="container">© Северная Библиотека · данные хранятся в вашем браузере</div></footer>
+    `;
+    attachBookClickHandlers();
+}
+
+/* ---------- КАТАЛОГ ---------- */
+async function renderCatalog() {
+    if (_booksCache.length === 0) {
+        await loadBooks();
+    }
+    const books = getAllBooks().slice().sort((a,b) => b.updatedAt - a.updatedAt);
+    app.innerHTML = `
+        <div class="container">
+            <section class="section" style="padding-top:60px">
+                <div class="section-head">
+                    <div class="section-title">Каталог книг</div>
+                    <span style="color:var(--text3); font-size:.85rem; font-family:var(--font-head)">${books.length} ${plural(books.length, 'книга', 'книги', 'книг')}</span>
+                </div>
+                ${books.length ? `<div class="books-grid">${books.map(bookCardHTML).join('')}</div>` : `<div class="empty">Пока ни одной книги</div>`}
+            </section>
+        </div>
+    `;
+    attachBookClickHandlers();
+}
+
+function bookCardHTML(book) {
+    const me = getCurrentUser();
+    const prog = me ? getReadingProgress(me.username, book.id) : null;
+    let badgeHTML = '';
+    let progressHTML = '';
+    if (prog && book.chaptersCount) {
+        const idx = Math.min(prog.chapterIndex, book.chaptersCount - 1);
+        const total = book.chaptersCount;
+        const percent = Math.round(((idx + 1) / total) * 100);
+        badgeHTML = `<div class="book-reading-badge">Читаю</div>`;
+        progressHTML = `
+            <div class="book-progress"><div class="book-progress-fill" style="width:${percent}%"></div></div>
+        `;
+    }
+    const coverInner = book.cover
+        ? `<img src="${escapeAttr(book.cover)}" alt="">`
+        : `<div class="book-cover-symbol">${book.coverSymbol || '📖'}</div>`;
+    return `
+        <button class="book-card" data-book-id="${book.id}">
+            <div class="book-cover">
+                ${badgeHTML}
+                ${coverInner}
+            </div>
+            <div class="book-title">${escapeHtml(book.title)}</div>
+            <div class="book-author">${escapeHtml(book.author)}</div>
+            <div class="book-meta">${book.chaptersCount} ${plural(book.chaptersCount, 'глава', 'главы', 'глав')}</div>
+            ${progressHTML}
+        </button>
+    `;
+}
+
+function attachBookClickHandlers() {
+    document.querySelectorAll('.book-card').forEach(card => {
+        card.addEventListener('click', () => {
+            currentBookId = card.dataset.bookId;
+            navigate('book');
+        });
+    });
+}
+
+/* ---------- СТРАНИЦА КНИГИ ---------- */
+async function renderBookPage() {
+    let book;
+    try {
+        book = await apiGetBook(currentBookId);
+    } catch(e) {
+        showToast('Книга не найдена', 'error');
+        navigate('catalog');
+        return;
+    }
+    const user = getCurrentUser();
+    const isOwner = user && book.author === user.username;
+let progress = null;
+if (user) {
+    try {
+        const readingList = await apiGetMyReading();
+        progress = readingList.find(item => item.book.id === book.id) || null;
+    } catch(e) {
+        progress = null;
+    }
+}
+const hasProgress = !!progress && book.chapters.length > 0;
+
+    let mainBtnLabel = 'Начать чтение';
+    let mainBtnTarget = 0;
+    if (hasProgress) {
+        mainBtnLabel = 'Продолжить читать';
+        mainBtnTarget = Math.min(progress.chapterIndex, book.chapters.length - 1);
+    }
+
+    const progressInfo = hasProgress ? `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding:14px 18px; background:var(--card); border:1px solid var(--accent); border-radius:10px">
+            <div style="font-family:var(--font-head); font-size:.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent)">Вы остановились на</div>
+            <div style="font-family:var(--font-title); font-size:1rem; color:var(--text); flex:1">Глава ${mainBtnTarget + 1}: ${escapeHtml(book.chapters[mainBtnTarget] ? book.chapters[mainBtnTarget].title : '')}</div>
+            <div style="font-family:var(--font-head); font-size:.85rem; color:var(--accent); letter-spacing:1px">${Math.round(((mainBtnTarget + 1) / book.chapters.length) * 100)}%</div>
+        </div>
+    ` : '';
+
+    const coverHTML = book.cover
+        ? `<div class="book-cover-large"><img src="${escapeAttr(book.cover)}" alt=""></div>`
+        : `<div class="book-cover-large"><div class="book-cover-symbol">${book.coverSymbol || '📖'}</div></div>`;
+
+    app.innerHTML = `
+        <div class="container">
+            <div class="book-page">
+                <button class="btn btn-ghost btn-sm" onclick="navigate('catalog')" style="margin-bottom:24px">← В каталог</button>
+                <div class="book-layout">
+                    <div>
+                        ${coverHTML}
+                    </div>
+                    <div class="book-info">
+                        <h1>${escapeHtml(book.title)}</h1>
+                        <div class="author">${escapeHtml(book.author)}</div>
+                        <div class="meta-line">
+                            <span>${book.genre || 'без жанра'}</span>
+                            <span>·</span>
+                            <span>${book.chapters.length} ${plural(book.chapters.length, 'глава', 'главы', 'глав')}</span>
+                            <span>·</span>
+                            <span>обновлено ${formatDate(book.updatedAt)}</span>
+                        </div>
+                        <div class="book-annotation">${escapeHtml(book.annotation || 'Аннотация отсутствует.')}</div>
+                        ${progressInfo}
+                        ${book.chapters.length ? `
+                            <div style="display:flex; gap:12px; flex-wrap:wrap">
+                                <button class="btn btn-primary" id="startReadingBtn">${mainBtnLabel}</button>
+                                ${hasProgress ? `<button class="btn btn-ghost" id="restartReadingBtn">Начать сначала</button>` : ''}
+                                ${isOwner ? `<button class="btn" id="editBookBtn">Редактировать</button>` : ''}
+                                ${isOwner ? `<button class="btn btn-ghost" id="deleteBookBtn">Удалить</button>` : ''}
+                                ${user && !isOwner ? `<button class="btn" id="writeAuthorBtn">Написать автору</button>` : ''}
+                            </div>
+                        ` : `<div class="empty">В книге пока нет глав</div>`}
+                        ${book.chapters.length ? `
+                            <div class="chapters-preview">
+                                <div class="section-title" style="margin-bottom:16px; font-size:.9rem">Оглавление</div>
+                                ${book.chapters.map((ch, i) => {
+                                    const isCurrent = hasProgress && mainBtnTarget === i;
+                                    return `
+                                        <div class="chapter-preview-item ${isCurrent ? 'current' : ''}" data-chapter-index="${i}">
+                                            <div>
+                                                <div class="num">Глава ${i + 1}</div>
+                                                <div class="title">${escapeHtml(ch.title)}</div>
+                                            </div>
+                                            ${isCurrent ? `<div class="current-mark">вы здесь</div>` : '<div class="arrow">→</div>'}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    const startBtn = document.getElementById('startReadingBtn');
+    if (startBtn) startBtn.addEventListener('click', () => navigate('reader', { chapterIndex: mainBtnTarget }));
+ const restartBtn = document.getElementById('restartReadingBtn');
+if (restartBtn) restartBtn.addEventListener('click', async () => {
+    await apiSaveProgress(book.id, 0);
+    navigate('reader', { chapterIndex: 0 });
+});
+    document.querySelectorAll('.chapter-preview-item').forEach(item => {
+        item.addEventListener('click', () => navigate('reader', { chapterIndex: parseInt(item.dataset.chapterIndex) }));
+    });
+    if (isOwner) {
+        document.getElementById('editBookBtn').addEventListener('click', () => navigate('editor', { editingBookId: book.id }));
+        document.getElementById('deleteBookBtn').addEventListener('click', async () => {
+            if (!confirm('Удалить книгу?')) return;
+            try {
+                await apiDeleteBook(book.id);
+                await loadBooks();
+                showToast('Книга удалена', 'success');
+                updateBookCounter();
+                navigate('catalog');
+            } catch (e) {
+                showToast('Ошибка удаления: ' + e.message, 'error');
+            }
+        });
+    }
+    if (user && !isOwner) {
+        const btn = document.getElementById('writeAuthorBtn');
+        if (btn) btn.addEventListener('click', async () => {
+            const chat = await getOrCreateDM(user.username, book.author);
+            currentChatId = chat.id;
+            navigate('messages', { chatId: chat.id });
+        });
+    }
+}
+    
+/* ---------- ЧИТАЛКА ---------- */
+async function renderReader() {
+    let book;
+    try {
+        book = await apiGetBook(currentBookId);
+    } catch(e) {
+        navigate('book');
+        return;
+    }
+    if (!book || !book.chapters.length) { navigate('book'); return; }
+    const idx = navData.chapterIndex || 0;
+    const chapter = book.chapters[idx] || book.chapters[0];
+    const realIdx = book.chapters.indexOf(chapter);
+    const paragraphs = chapter.content.split('\n').filter(p => p.trim());
+
+    const me = getCurrentUser();
+if (me) {
+    // Сохраняем прогресс на сервер
+    await apiSaveProgress(book.id, realIdx);
+}
+
+    app.innerHTML = `
+        <div class="container">
+            <div class="reader-view">
+                <div class="reader-toolbar">
+                    <button class="btn btn-ghost btn-sm" onclick="navigate('book')">← К книге</button>
+                    <div class="current-chapter">${escapeHtml(book.title)} · ${escapeHtml(chapter.title)}</div>
+                    <span style="font-family:var(--font-head); font-size:.75rem; color:var(--text3)">${realIdx + 1} / ${book.chapters.length}</span>
+                </div>
+                <div class="reader-content">
+                    <h2>${escapeHtml(chapter.title)}</h2>
+                    <div class="chapter-label">${escapeHtml(book.title)}</div>
+                    ${paragraphs.map(p => `<p>${escapeHtml(p)}</p>`).join('')}
+                    <div class="reader-nav">
+                        <button class="btn ${realIdx === 0 ? 'btn-ghost' : ''}" id="prevChapter" ${realIdx === 0 ? 'disabled' : ''}>← Предыдущая</button>
+                        <button class="btn btn-primary" id="nextChapter" ${realIdx === book.chapters.length - 1 ? 'disabled' : ''}>Следующая →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('prevChapter').addEventListener('click', () => {
+        if (realIdx > 0) navigate('reader', { chapterIndex: realIdx - 1 });
+    });
+    document.getElementById('nextChapter').addEventListener('click', () => {
+        if (realIdx < book.chapters.length - 1) navigate('reader', { chapterIndex: realIdx + 1 });
+    });
+}
+
+/* ---------- МОИ КНИГИ ---------- */
+async function renderMyBooks() {
+    const user = getCurrentUser();
+    if (!user) {
+        app.innerHTML = `<div class="container"><section class="section" style="padding-top:80px; text-align:center">
+            <h1 style="font-family:var(--font-title); font-size:2rem; margin-bottom:12px">Личный кабинет</h1>
+            <p style="color:var(--text2); margin-bottom:24px">Войдите или создайте аккаунт</p>
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="openAuth('login')">Войти</button>
+                <button class="btn" onclick="openAuth('register')">Регистрация</button>
+            </div></section></div>`;
+        return;
+    }
+    let myBooks = [];
+    try {
+        myBooks = await apiGetMyBooks();
+    } catch(e) {
+        console.error('Ошибка загрузки моих книг:', e);
+        myBooks = [];
+    }
+    const friendsCount = getFriendsCount(user.username);
+    const communitiesCount = getMyCommunities(user.username).length;
+
+    app.innerHTML = `
+        <div class="container">
+            <div class="dashboard">
+                <div class="dashboard-head">
+                    <div>
+                        <h1>Мои книги</h1>
+                        <div class="subtitle">${escapeHtml(displayName(user))} · ${myBooks.length} ${plural(myBooks.length, 'книга', 'книги', 'книг')} · ${friendsCount} ${plural(friendsCount, 'друг', 'друга', 'друзей')} · ${communitiesCount} ${plural(communitiesCount, 'сообщество', 'сообщества', 'сообществ')}</div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="btn" onclick="navigate('profile', {username: '${escapeAttr(user.username)}'})">Мой профиль</button>
+                        <button class="btn btn-primary" id="newBookBtn">+ Новая книга</button>
+                    </div>
+                </div>
+                ${myBooks.length ? `
+                    <div class="my-books">
+                        ${myBooks.map(book => {
+                            const coverInner = book.cover
+                                ? `<img src="${escapeAttr(book.cover)}" alt="">`
+                                : (book.coverSymbol || '📖');
+                            return `
+                            <div class="my-book-item">
+                                <div class="my-book-cover">${coverInner}</div>
+                                <div class="my-book-info">
+                                    <div class="title">${escapeHtml(book.title)}</div>
+                                    <div class="meta">${book.chaptersCount} ${plural(book.chaptersCount, 'глава', 'главы', 'глав')} · обновлено ${formatDate(book.updatedAt)}</div>
+                                </div>
+                                <div class="my-book-actions">
+                                    <button class="btn btn-sm" data-view="${book.id}">Читать</button>
+                                    <button class="btn btn-sm" data-edit="${book.id}">Редактировать</button>
+                                    <button class="btn btn-ghost btn-sm" data-delete="${book.id}">Удалить</button>
+                                </div>
+                            </div>
+                        `}).join('')}
+                    </div>
+                ` : `<div class="empty">У вас пока нет книг</div>`}
+            </div>
+        </div>
+    `;
+    document.getElementById('newBookBtn').addEventListener('click', () => navigate('editor', { editingBookId: null }));
+    document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { currentBookId = b.dataset.view; navigate('book'); }));
+    document.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => navigate('editor', { editingBookId: b.dataset.edit })));
+    document.querySelectorAll('[data-delete]').forEach(b => b.addEventListener('click', async () => {
+        if (!confirm('Удалить книгу?')) return;
+        const bookId = b.dataset.delete;
+        try {
+            await apiDeleteBook(bookId);
+            await loadBooks();
+            showToast('Книга удалена', 'success');
+            updateBookCounter();
+            render();
+        } catch (e) {
+            showToast('Ошибка удаления: ' + e.message, 'error');
+        }
+    }));
+}
+
+/* ---------- МОЁ ЧТЕНИЕ ---------- */
+async function renderReadingPage() {
+    const user = getCurrentUser();
+    if (!user) {
+        app.innerHTML = `<div class="container"><section class="section" style="padding-top:80px; text-align:center">
+            <h1 style="font-family:var(--font-title); font-size:2rem; margin-bottom:12px">Моё чтение</h1>
+            <p style="color:var(--text2); margin-bottom:24px">Войдите, чтобы отслеживать прогресс чтения</p>
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="openAuth('login')">Войти</button>
+                <button class="btn" onclick="openAuth('register')">Регистрация</button>
+            </div></section></div>`;
+        return;
+    }
+
+    let list = await apiGetMyReading();
+
+    app.innerHTML = `
+        <div class="container">
+            <div class="dashboard">
+                <div class="dashboard-head">
+                    <div>
+                        <h1>Моё чтение</h1>
+                        <div class="subtitle">Книги, которые вы читаете — ${list.length} ${plural(list.length, 'книга', 'книги', 'книг')}</div>
+                    </div>
+                    <button class="btn" onclick="navigate('catalog')">Найти новые книги →</button>
+                </div>
+
+                ${list.length ? `
+                    <div class="reading-list">
+                        ${list.map(item => {
+                            const coverInner = item.book.cover
+                                ? `<img src="${escapeAttr(item.book.cover)}" alt="">`
+                                : (item.book.coverSymbol || '📖');
+                            const total = item.book.chaptersCount || 1;
+                            const idx = Math.min(item.chapterIndex || 0, total - 1);
+                            const percent = Math.round(((idx + 1) / total) * 100);
+                            return `
+                            <div class="reading-item">
+                                <div class="reading-cover">${coverInner}</div>
+                                <div class="reading-info">
+                                    <div class="title">${escapeHtml(item.book.title)}</div>
+                                    <div class="author">${escapeHtml(item.book.author)}</div>
+                                    <div class="chapter-now">Глава ${idx + 1} из ${total}</div>
+                                    <div class="reading-progress-bar"><div style="width:${percent}%"></div></div>
+                                    <div class="reading-progress-text">Прочитано ${percent}% · обновлено ${formatDate(item.updatedAt)}</div>
+                                </div>
+                                <div class="reading-actions">
+                                    <button class="btn btn-primary btn-sm" data-continue="${item.book.id}" data-chapter="${idx}">Продолжить читать</button>
+                                    <button class="btn btn-ghost btn-sm" data-restart="${item.book.id}">Начать сначала</button>
+                                </div>
+                            </div>
+                        `}).join('')}
+                    </div>
+                ` : `<div class="empty">Вы пока не начали читать ни одной книги</div>`}
+            </div>
+        </div>
+    `;
+
+    document.querySelectorAll('[data-continue]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentBookId = btn.dataset.continue;
+            const ch = parseInt(btn.dataset.chapter);
+            navigate('reader', { chapterIndex: ch });
+        });
+    });
+    document.querySelectorAll('[data-restart]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const bookId = btn.dataset.restart;
+            await apiSaveProgress(bookId, 0);
+            currentBookId = bookId;
+            navigate('reader', { chapterIndex: 0 });
+        });
+    });
+}
+
+/* ---------- РЕДАКТОР КНИГИ ---------- */
+let bookCoverData = null;
+
+async function renderEditor() {
+    const user = getCurrentUser();
+    if (!user) { navigate('mybooks'); return; }
+    const editingId = navData.editingBookId;
+    let existing = null;
+    if (editingId) {
+        try {
+            existing = await apiGetBook(editingId);
+        } catch(e) {
+            showToast('Книга не найдена', 'error');
+            navigate('mybooks');
+            return;
+        }
+    }
+    const isEdit = !!existing;
+    if (isEdit && existing.author !== user.username) {
+        showToast('Это не ваша книга', 'error');
+        navigate('mybooks');
+        return;
+    }
+    const draft = existing || {
+        title: '', author: user.username, annotation: '',
+        coverSymbol: '📖', cover: null, genre: '',
+        chapters: [{ id: 'c' + Date.now(), title: 'Глава 1', content: '' }]
+    };
+    const isCustomGenre = draft.genre && !GENRES.includes(draft.genre);
+    const genreOptions = GENRES.map(g => `<option value="${escapeAttr(g)}" ${(!isCustomGenre && draft.genre === g) ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('');
+    bookCoverData = draft.cover || null;
+
+    app.innerHTML = `
+        <div class="container">
+            <div class="editor">
+                <h1>${isEdit ? 'Редактирование книги' : 'Новая книга'}</h1>
+                <div class="sub">Все условия должны быть выполнены перед публикацией</div>
+                <div class="requirements">
+                    <h3>Требования к публикации</h3>
+                    <ul class="req-list" id="reqList"></ul>
+                </div>
+                <div class="card">
+                    <div class="field"><label>Название <span class="req">*</span></label><input type="text" id="bookTitle" value="${escapeAttr(draft.title)}" placeholder="Название книги"></div>
+                    <div class="field"><label>Автор (псевдоним) <span class="req">*</span></label><input type="text" id="bookAuthor" value="${escapeAttr(draft.author)}" placeholder="Ваш псевдоним"></div>
+
+                    <div class="field">
+                        <label>Жанр <span class="req">*</span></label>
+                        <select id="bookGenre">
+                            <option value="">— Выберите жанр —</option>
+                            ${genreOptions}
+                            <option value="__custom__" ${isCustomGenre ? 'selected' : ''}>Другое (ввести вручную)</option>
+                        </select>
+                    </div>
+                    <div class="field" id="customGenreField" style="display:${isCustomGenre ? 'block' : 'none'}">
+                        <label>Свой жанр <span class="req">*</span></label>
+                        <input type="text" id="bookCustomGenre" value="${isCustomGenre ? escapeAttr(draft.genre) : ''}" placeholder="Введите свой жанр" maxlength="50">
+                        <div class="hint">От 2 до 50 символов.</div>
+                    </div>
+
+                    <div class="field">
+                        <label>Обложка книги</label>
+                        <div class="cover-uploader">
+                            <div class="cover-preview-box" id="coverPreviewBox">
+                                ${bookCoverData
+                                    ? `<img src="${escapeAttr(bookCoverData)}" alt="">`
+                                    : `<div class="book-cover-symbol">${escapeHtml(draft.coverSymbol || '📖')}</div>`}
+                            </div>
+                            <div class="cover-uploader-info">
+                                <p>Загрузите свою картинку-обложку (JPG, PNG, до 2 МБ). Если не загружать — на обложке будет показан символ.</p>
+                                <input type="file" id="bookCoverInput" accept="image/*" style="display:none">
+                                <div class="cover-uploader-actions">
+                                    <button type="button" class="btn btn-sm" id="bookCoverChooseBtn">Загрузить обложку</button>
+                                    <button type="button" class="btn btn-ghost btn-sm" id="bookCoverRemoveBtn">Убрать обложку</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field"><label>Символ на обложке (если нет картинки)</label><input type="text" id="bookSymbol" value="${escapeAttr(draft.coverSymbol)}" maxlength="3" placeholder="✦"></div>
+                    <div class="field"><label>Аннотация <span class="req">*</span></label><textarea id="bookAnnotation" placeholder="О чём книга...">${escapeHtml(draft.annotation)}</textarea><div class="hint"><span id="annotationCount">0</span> / 80</div></div>
+                </div>
+                <div class="section-head" style="margin-top:32px"><div class="section-title">Главы</div><button class="btn btn-sm" id="addChapterBtn">+ Добавить главу</button></div>
+                <div id="chaptersList"></div>
+                <label class="agree-row" id="agreeRow">
+                    <input type="checkbox" id="agreeCheck">
+                    <div class="agree-text">Я подтверждаю, что текст принадлежит мне или я имею право на публикацию. Я согласен с <a href="#" id="showRulesLink">правилами публикации</a>.</div>
+                </label>
+                <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap">
+                    <button class="btn btn-primary" id="saveBookBtn" style="flex:1" disabled>${isEdit ? 'Сохранить' : 'Опубликовать'}</button>
+                    <button class="btn btn-ghost" id="cancelBtn">Отмена</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const chaptersList = document.getElementById('chaptersList');
+    const reqList = document.getElementById('reqList');
+    const agreeCheck = document.getElementById('agreeCheck');
+    const agreeRow = document.getElementById('agreeRow');
+    const saveBtn = document.getElementById('saveBookBtn');
+    const genreSelect = document.getElementById('bookGenre');
+    const customGenreField = document.getElementById('customGenreField');
+    const customGenreInput = document.getElementById('bookCustomGenre');
+    const coverPreviewBox = document.getElementById('coverPreviewBox');
+
+    genreSelect.addEventListener('change', () => {
+        if (genreSelect.value === '__custom__') {
+            customGenreField.style.display = 'block';
+            customGenreInput.focus();
+        } else {
+            customGenreField.style.display = 'none';
+        }
+        checkAll();
+    });
+    customGenreInput.addEventListener('input', checkAll);
+
+    document.getElementById('bookCoverChooseBtn').addEventListener('click', () => {
+        document.getElementById('bookCoverInput').click();
+    });
+    document.getElementById('bookCoverInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { showToast('Файл слишком большой (макс 2 МБ)', 'error'); return; }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            bookCoverData = ev.target.result;
+            coverPreviewBox.innerHTML = `<img src="${escapeAttr(bookCoverData)}" alt="">`;
+        };
+        reader.readAsDataURL(file);
+    });
+    document.getElementById('bookCoverRemoveBtn').addEventListener('click', () => {
+        bookCoverData = null;
+        const sym = document.getElementById('bookSymbol').value.trim() || '📖';
+        coverPreviewBox.innerHTML = `<div class="book-cover-symbol">${escapeHtml(sym)}</div>`;
+    });
+    document.getElementById('bookSymbol').addEventListener('input', () => {
+        if (!bookCoverData) {
+            const sym = document.getElementById('bookSymbol').value.trim() || '📖';
+            coverPreviewBox.innerHTML = `<div class="book-cover-symbol">${escapeHtml(sym)}</div>`;
+        }
+    });
+
+    function getSelectedGenre() {
+        if (genreSelect.value === '__custom__') return customGenreInput.value.trim();
+        return genreSelect.value;
+    }
+
+    function renderChapters(chapters) {
+        chaptersList.innerHTML = chapters.map((ch, i) => `
+            <div class="chapter-editor-item" data-idx="${i}">
+                <div class="chapter-editor-head">
+                    <input type="text" class="ch-title" value="${escapeAttr(ch.title)}" placeholder="Название главы">
+                    <button class="icon-btn" data-remove="${i}" ${chapters.length === 1 ? 'disabled style="opacity:.3"' : ''}>×</button>
+                </div>
+                <textarea class="ch-content" placeholder="Текст главы. Абзацы разделяйте пустой строкой.">${escapeHtml(ch.content)}</textarea>
+                <div class="hint"><span class="ch-counter">0</span> / 500</div>
+            </div>
+        `).join('');
+        chaptersList.querySelectorAll('[data-remove]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const i = parseInt(btn.dataset.remove);
+                if (chapters.length <= 1) return;
+                chapters.splice(i, 1); renderChapters(chapters); checkAll();
+            });
+        });
+        chaptersList.querySelectorAll('.ch-content').forEach(ta => {
+            ta.addEventListener('input', () => {
+                const counter = ta.parentElement.querySelector('.ch-counter');
+                if (counter) counter.textContent = ta.value.trim().length;
+                checkAll();
+            });
+        });
+    }
+
+    function checkAll() {
+        const title = document.getElementById('bookTitle').value.trim();
+        const author = document.getElementById('bookAuthor').value.trim();
+        const genre = getSelectedGenre();
+        const annotation = document.getElementById('bookAnnotation').value.trim();
+        const chapterItems = chaptersList.querySelectorAll('.chapter-editor-item');
+        const annCount = document.getElementById('annotationCount');
+        if (annCount) annCount.textContent = annotation.length;
+        const chaptersData = [];
+        chapterItems.forEach(item => {
+            const t = item.querySelector('.ch-title').value.trim();
+            const c = item.querySelector('.ch-content').value.trim();
+            chaptersData.push({ title: t, content: c, length: c.length });
+        });
+        const checks = [
+            { ok: title.length >= 3, label: 'Название книги', hint: 'Не менее 3 символов', value: title.length + ' / 3' },
+            { ok: author.length >= 2, label: 'Автор', hint: 'Имя автора или псевдоним', value: author.length + ' / 2' },
+            { ok: genre.length >= 2, label: 'Жанр', hint: 'Не менее 2 символов', value: genre.length + ' / 2' },
+            { ok: annotation.length >= 80, label: 'Аннотация', hint: 'Не менее 80 символов', value: annotation.length + ' / 80' },
+            { ok: chaptersData.length >= 1 && chaptersData[0].content.length >= 500, label: 'Первая глава', hint: 'Не менее 500 символов', value: chaptersData[0] ? chaptersData[0].content.length + ' / 500' : '0 / 500' },
+            { ok: chaptersData.every(c => c.title.length >= 1), label: 'Все главы названы', hint: 'У каждой главы название', value: chaptersData.every(c => c.title.length >= 1) ? 'ок' : 'есть пустые' },
+            { ok: agreeCheck.checked, label: 'Согласие с правилами', hint: 'Отметьте галочку', value: agreeCheck.checked ? 'да' : 'нет' }
+        ];
+        reqList.innerHTML = checks.map(c => `
+            <li class="req-item ${c.ok ? 'ok' : 'fail'}">
+                <div class="req-icon">${c.ok ? '✓' : '!'}</div>
+                <div class="req-text"><strong>${c.label}</strong><small>${c.hint} · ${c.value}</small></div>
+            </li>
+        `).join('');
+        const allOk = checks.every(c => c.ok);
+        saveBtn.disabled = !allOk;
+        return allOk;
+    }
+
+    renderChapters(draft.chapters);
+    ['bookTitle', 'bookAuthor', 'bookAnnotation'].forEach(id => {
+        document.getElementById(id).addEventListener('input', checkAll);
+    });
+    agreeCheck.addEventListener('change', () => { agreeRow.classList.toggle('checked', agreeCheck.checked); checkAll(); });
+    agreeRow.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'A') {
+            agreeCheck.checked = !agreeCheck.checked;
+            agreeRow.classList.toggle('checked', agreeCheck.checked);
+            checkAll();
+        }
+    });
+    document.getElementById('showRulesLink').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('rulesOverlay').classList.add('active'); });
+    document.getElementById('addChapterBtn').addEventListener('click', () => {
+        draft.chapters.push({ id: 'c' + Date.now(), title: 'Глава ' + (draft.chapters.length + 1), content: '' });
+        renderChapters(draft.chapters); checkAll();
+    });
+    checkAll();
+
+    saveBtn.addEventListener('click', async () => {
+        if (!checkAll()) { showToast('Не все условия выполнены', 'error'); return; }
+        const title = document.getElementById('bookTitle').value.trim();
+        const author = document.getElementById('bookAuthor').value.trim() || user.username;
+        const genre = getSelectedGenre();
+        const symbol = document.getElementById('bookSymbol').value.trim() || '📖';
+        const annotation = document.getElementById('bookAnnotation').value.trim();
+
+        const chapterItems = chaptersList.querySelectorAll('.chapter-editor-item');
+        const newChapters = [];
+        chapterItems.forEach((item, i) => {
+            const t = item.querySelector('.ch-title').value.trim();
+            const c = item.querySelector('.ch-content').value;
+            if (t || c.trim()) {
+                newChapters.push({ title: t || ('Глава ' + (i + 1)), content: c });
+            }
+        });
+
+        let coverUrl = existing ? existing.cover : null;
+
+        if (bookCoverData && bookCoverData.startsWith('data:')) {
+            try {
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Загрузка обложки...';
+                const blob = await (await fetch(bookCoverData)).blob();
+                const file = new File([blob], 'cover.jpg', { type: blob.type });
+                const up = await apiUploadImage(file);
+                coverUrl = up.url;
+            } catch (e) {
+                showToast('Ошибка загрузки обложки: ' + e.message, 'error');
+                saveBtn.disabled = false;
+                saveBtn.textContent = isEdit ? 'Сохранить' : 'Опубликовать';
+                return;
+            }
+        }
+        if (bookCoverData === null) coverUrl = null;
+
+        const payload = {
+            title, annotation, genre, coverUrl,
+            coverSymbol: symbol,
+            status: 'published',
+            chapters: newChapters,
+        };
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = isEdit ? 'Сохранение...' : 'Публикация...';
+
+        try {
+            if (isEdit) {
+                await apiUpdateBook(existing.id, payload);
+                showToast('Книга обновлена', 'success');
+            } else {
+                await apiCreateBook(payload);
+                showToast('Книга опубликована!', 'success');
+            }
+            await loadBooks();
+            navigate('mybooks');
+        } catch (e) {
+            console.error('Ошибка сохранения:', e);
+            showToast('Ошибка: ' + (e.message || 'не удалось сохранить'), 'error');
+            saveBtn.disabled = false;
+            saveBtn.textContent = isEdit ? 'Сохранить' : 'Опубликовать';
+        }
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', () => navigate('mybooks'));
+}
+
+/* ---------- МЕССЕНДЖЕР ---------- */
+function renderMessages() {
+    const user = getCurrentUser();
+    if (!user) {
+        app.innerHTML = `<div class="container"><section class="section" style="padding-top:80px; text-align:center">
+            <h1 style="font-family:var(--font-title); font-size:2rem; margin-bottom:12px">Сообщения</h1>
+            <p style="color:var(--text2); margin-bottom:24px">Войдите, чтобы общаться</p>
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="openAuth('login')">Войти</button>
+                <button class="btn" onclick="openAuth('register')">Регистрация</button>
+            </div></section></div>`;
+        return;
+    }
+    if (navData.chatId) { currentChatId = navData.chatId; navData.chatId = null; }
+    getOrCreateGeneralChat();
+    const allChats = getAllChats();
+    const myChats = Object.values(allChats).filter(c => {
+        if (c.type === 'general') return true;
+        if (c.type === 'dm') return c.members && c.members.includes(user.username);
+        if (c.type === 'community') {
+            const comm = getCommunity(c.communityId);
+            return comm && comm.members.includes(user.username);
+        }
+        return false;
+    }).sort((a, b) => (b.lastMessageAt || 0) - (a.lastMessageAt || 0));
+    if (!currentChatId && myChats.length) currentChatId = myChats[0].id;
+    app.innerHTML = `
+        <div class="messenger">
+            <aside class="chat-sidebar" id="chatSidebar">
+                <div class="chat-sidebar-head">
+                    <h2>Сообщения</h2>
+                    <button class="icon-btn" id="newChatBtn" title="Все пользователи">☺</button>
+                </div>
+                <div class="chat-tabs">
+                    <button class="chat-tab ${chatTab === 'dialogs' ? 'active' : ''}" data-tab="dialogs">Диалоги</button>
+                    <button class="chat-tab ${chatTab === 'general' ? 'active' : ''}" data-tab="general">Общий</button>
+                    <button class="chat-tab ${chatTab === 'communities' ? 'active' : ''}" data-tab="communities">Сообщества</button>
+                </div>
+                <div class="chat-list" id="chatList"></div>
+            </aside>
+            <section class="chat-main" id="chatMain"></section>
+        </div>
+    `;
+    document.getElementById('newChatBtn').addEventListener('click', () => togglePanel('usersPanel', 'usersBackdrop'));
+    document.querySelectorAll('.chat-tab').forEach(t => {
+        t.addEventListener('click', () => {
+            chatTab = t.dataset.tab;
+            if (chatTab === 'general') currentChatId = 'general';
+            else if (chatTab === 'dialogs') {
+                const first = myChats.find(c => c.type === 'dm');
+                currentChatId = first ? first.id : null;
+            } else {
+                const first = myChats.find(c => c.type === 'community');
+                currentChatId = first ? first.id : null;
+            }
+            renderMessages();
+        });
+    });
+    renderChatList(myChats, user);
+    renderChatMain(user);
+    updateUnreadBadge();
+}
+
+function renderChatList(myChats, user) {
+    const list = document.getElementById('chatList');
+    let items = myChats;
+    if (chatTab === 'general') items = myChats.filter(c => c.type === 'general');
+    if (chatTab === 'dialogs') items = myChats.filter(c => c.type === 'dm');
+    if (chatTab === 'communities') items = myChats.filter(c => c.type === 'community');
+    if (!items.length) {
+        list.innerHTML = `<div style="padding:24px; color:var(--text3); text-align:center; font-size:.85rem; font-style:italic">Нет чатов</div>`;
+        return;
+    }
+    list.innerHTML = items.map(c => {
+        const msgs = getMessages(c.id);
+        const last = msgs[msgs.length - 1];
+        const unread = getUnreadCount(user.username, c.id);
+        let name, preview, avatarHTML_str;
+        if (c.type === 'general') {
+            name = 'Общий чат';
+            preview = last ? `${displayName(last.from)}: ${truncate(last.text, 40)}` : 'Пока пусто';
+            avatarHTML_str = `<div class="avatar size-md" style="background:var(--accent2)">#</div>`;
+        } else if (c.type === 'dm') {
+            const other = c.members.find(m => m !== user.username) || '?';
+            const otherData = getUsers()[other] || {};
+            name = displayName({ username: other, ...otherData });
+            preview = last ? `${last.from === user.username ? 'Вы: ' : ''}${truncate(last.text, 40)}` : 'Начните переписку';
+            avatarHTML_str = avatarHTML({ username: other, ...otherData }, 'md');
+        } else {
+            const comm = getCommunity(c.communityId);
+            if (!comm) return '';
+            name = comm.title;
+            preview = last ? `${displayName(last.from)}: ${truncate(last.text, 40)}` : 'Пока пусто';
+            avatarHTML_str = comm.avatar
+                ? `<div class="avatar size-md" style="border-radius:10px"><img src="${escapeAttr(comm.avatar)}" alt=""></div>`
+                : `<div class="avatar size-md" style="background:var(--accent2);border-radius:10px">#</div>`;
+        }
+        return `
+            <div class="chat-item ${c.id === currentChatId ? 'active' : ''}" data-chat-id="${c.id}">
+                ${avatarHTML_str}
+                <div class="chat-item-info">
+                    <div class="chat-item-name">${escapeHtml(name)}</div>
+                    <div class="chat-item-preview">${escapeHtml(preview)}</div>
+                </div>
+                ${unread ? `<div class="chat-item-unread">${unread}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+    list.querySelectorAll('.chat-item').forEach(el => {
+        el.addEventListener('click', () => {
+            currentChatId = el.dataset.chatId;
+            markChatRead(user.username, currentChatId);
+            renderMessages();
+        });
+    });
+}
+
+function renderChatMain(user) {
+    const main = document.getElementById('chatMain');
+    if (!currentChatId) {
+        main.innerHTML = `<div class="chat-empty"><div class="chat-empty-icon">💬</div><div>Выберите чат<br>или начните новый</div></div>`;
+        return;
+    }
+    const chats = getAllChats();
+    const chat = chats[currentChatId];
+    if (!chat) { main.innerHTML = `<div class="chat-empty">Чат не найден</div>`; return; }
+    if (chat.type === 'dm' && !chat.members.includes(user.username)) { main.innerHTML = `<div class="chat-empty">Нет доступа</div>`; return; }
+    if (chat.type === 'community') {
+        const comm = getCommunity(chat.communityId);
+        if (!comm || !comm.members.includes(user.username)) { main.innerHTML = `<div class="chat-empty">Нет доступа</div>`; return; }
+    }
+    let chatTitle, chatOnline = false, chatAvatar;
+    if (chat.type === 'general') {
+        chatTitle = 'Общий чат';
+        chatAvatar = `<div class="avatar size-md" style="background:var(--accent2)">#</div>`;
+    } else if (chat.type === 'dm') {
+        chatTitle = chat.members.find(m => m !== user.username) || 'Диалог';
+        chatOnline = isUserOnline(chatTitle);
+        chatAvatar = avatarHTML(chatTitle, 'md');
+    } else {
+        const comm = getCommunity(chat.communityId);
+        chatTitle = comm.title;
+        chatAvatar = comm.avatar
+            ? `<div class="avatar size-md" style="border-radius:10px"><img src="${escapeAttr(comm.avatar)}" alt=""></div>`
+            : `<div class="avatar size-md" style="background:var(--accent2);border-radius:10px">#</div>`;
+    }
+    markChatRead(user.username, currentChatId);
+    const msgs = getMessages(currentChatId);
+    main.innerHTML = `
+        <div class="chat-header">
+            <button class="chat-back-btn" id="chatBackBtn">←</button>
+            ${chatAvatar}
+            <div style="flex:1;min-width:0">
+                <div class="name">${escapeHtml(chatTitle)}</div>
+                <div class="status">${chat.type === 'general' ? 'все пользователи' : chat.type === 'community' ? 'сообщество' : (chatOnline ? 'в сети' : 'не в сети')}</div>
+            </div>
+            ${chat.type === 'community' ? `<button class="btn btn-sm" onclick="navigate('community', {communityId:'${escapeAttr(chat.communityId)}'})">Открыть</button>` : ''}
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-area">
+            <textarea id="chatInput" placeholder="Написать сообщение..." rows="1"></textarea>
+            <button class="send-btn" id="sendBtn">Отправить</button>
+        </div>
+    `;
+    const messagesBox = document.getElementById('chatMessages');
+    messagesBox.innerHTML = msgs.map(m => {
+        const isMine = m.from === user.username;
+        return `
+            <div class="msg ${isMine ? 'msg-out' : 'msg-in'}">
+                ${!isMine && chat.type !== 'dm' ? `<div class="msg-author">${escapeHtml(displayName(m.from))}</div>` : ''}
+                ${escapeHtml(m.text)}
+                <div class="msg-time">${formatTime(m.at)}</div>
+            </div>
+        `;
+    }).join('');
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+    const input = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    function doSend() {
+        const text = input.value.trim();
+        if (!text) return;
+        sendMessage(currentChatId, user.username, text);
+        touchLastSeen(user.username);
+        input.value = '';
+        input.style.height = 'auto';
+        renderChatMain(user);
+    }
+    sendBtn.addEventListener('click', doSend);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+    });
+    input.addEventListener('input', () => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    });
+    const backBtn = document.getElementById('chatBackBtn');
+    if (backBtn) backBtn.addEventListener('click', () => document.getElementById('chatSidebar').classList.add('hide-mobile'));
+    if (window.innerWidth <= 900) document.getElementById('chatSidebar').classList.add('hide-mobile');
+}
+
+/* ---------- ПРОФИЛЬ ---------- */
+async function renderProfilePage() {
+    const username = navData.username || currentProfileUser;
+    const me = getCurrentUser();
+    if (!username) { navigate('home'); return; }
+
+    // Если это я — берём из _currentUser, иначе с сервера
+    let user;
+    if (me && username === me.username) {
+        user = me;
+    } else {
+        try {
+            const u = await apiGetUser(username);
+            user = u;
+        } catch(e) {
+            showToast('Пользователь не найден', 'error');
+            navigate('home');
+            return;
+        }
+    }
+    if (!user || !user.username) { navigate('home'); return; }
+    const isMe = me && me.username === username;
+    const friendStatus = isMe ? 'me' : getFriendStatus(me ? me.username : null, username);
+    const online = isUserOnline(username);
+    const handle = user.handle ? '@' + user.handle : '@' + username.toLowerCase();
+    let booksByUser = [];
+try {
+    const all = await apiGetUsers(); // чтобы загрузить кэш
+    const userBooks = await api('/api/users/' + (user.id || username) + '/books');
+    booksByUser = userBooks.map(normalizeBook);
+} catch(e) {
+    booksByUser = getAllBooks().filter(b => b.author === username);
+}
+    const communities = getMyCommunities(username);
+    const friendsCount = getFriendsCount(username);
+
+    app.innerHTML = `
+        <div class="container">
+            <div class="profile-page">
+                <div class="profile-card">
+                    <div class="profile-banner"></div>
+                    <div class="profile-main">
+                        <div class="profile-avatar-wrap">
+                            <div class="profile-avatar">
+                                ${user.avatar ? `<img src="${escapeAttr(user.avatar)}" alt="">` : (user.displayName || user.username).charAt(0).toUpperCase()}
+                                <span class="status-dot ${online ? '' : 'off'}"></span>
+                            </div>
+                            <div class="profile-actions">
+                                ${isMe ? `<button class="btn" id="editProfileBtn">Редактировать профиль</button>` : ''}
+                                ${me && !isMe && friendStatus === 'none' ? `<button class="btn btn-primary" id="addFriendBtn">+ В друзья</button>` : ''}
+                                ${me && !isMe && friendStatus === 'friends' ? `<button class="btn btn-danger" id="unfriendBtn">Удалить из друзей</button>` : ''}
+                                ${me && !isMe && friendStatus === 'outgoing' ? `<button class="btn btn-ghost" id="cancelOutgoingBtn">Отменить заявку</button>` : ''}
+                                ${me && !isMe && friendStatus === 'incoming' ? `<button class="btn btn-success" id="acceptFriendBtn">Принять заявку</button>` : ''}
+                                ${me && !isMe ? `<button class="btn" id="writeBtn">Написать</button>` : ''}
+                            </div>
+                        </div>
+                        <div class="profile-name">${escapeHtml(displayName(user))}</div>
+                        <div class="profile-username">${escapeHtml(handle)}</div>
+                        <div class="profile-status ${online ? 'online' : ''}">${online ? '● в сети' : '○ не в сети'}</div>
+                        ${user.bio ? `<div class="profile-bio">${escapeHtml(user.bio)}</div>` : ''}
+                        <div class="profile-stats">
+                            <div class="profile-stat"><div class="profile-stat-num">${booksByUser.length}</div><div class="profile-stat-label">${plural(booksByUser.length, 'Книга', 'Книги', 'Книг')}</div></div>
+                            <div class="profile-stat"><div class="profile-stat-num">${friendsCount}</div><div class="profile-stat-label">${plural(friendsCount, 'Друг', 'Друга', 'Друзей')}</div></div>
+                            <div class="profile-stat"><div class="profile-stat-num">${communities.length}</div><div class="profile-stat-label">${plural(communities.length, 'Сообщество', 'Сообщества', 'Сообществ')}</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                ${booksByUser.length ? `
+                    <div class="section-head"><div class="section-title">Книги автора</div></div>
+                    <div class="profile-grid">${booksByUser.map(bookCardHTML).join('')}</div>
+                ` : ''}
+
+                ${communities.length ? `
+                    <div class="section-head" style="margin-top:40px"><div class="section-title">Сообщества</div></div>
+                    <div class="communities-grid">${communities.map(communityCardHTML).join('')}</div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+
+    const editBtn = document.getElementById('editProfileBtn');
+    if (editBtn) editBtn.addEventListener('click', openEditProfile);
+
+    const addBtn = document.getElementById('addFriendBtn');
+    if (addBtn) addBtn.addEventListener('click', () => {
+        const r = sendFriendRequest(me.username, username);
+        showToast(r.msg, r.ok ? 'success' : 'error');
+        render();
+    });
+    const unfriendBtn = document.getElementById('unfriendBtn');
+    if (unfriendBtn) unfriendBtn.addEventListener('click', () => {
+        if (!confirm('Удалить из друзей?')) return;
+        const r = removeFriend(me.username, username);
+        showToast(r.msg, 'success');
+        render();
+    });
+    const cancelOutgoingBtn = document.getElementById('cancelOutgoingBtn');
+    if (cancelOutgoingBtn) cancelOutgoingBtn.addEventListener('click', () => {
+        const r = cancelOutgoing(me.username, username);
+        showToast(r.msg, 'success');
+        render();
+    });
+    const acceptFriendBtn = document.getElementById('acceptFriendBtn');
+    if (acceptFriendBtn) acceptFriendBtn.addEventListener('click', () => {
+        const r = acceptFriendRequest(me.username, username);
+        showToast(r.msg, 'success');
+        renderTopbarUser();
+        render();
+    });
+    const writeBtn = document.getElementById('writeBtn');
+    if (writeBtn) writeBtn.addEventListener('click', async () => {
+        const chat = await getOrCreateDM(me.username, username);
+        currentChatId = chat.id;
+        navigate('messages', { chatId: chat.id });
+    });
+
+    attachBookClickHandlers();
+    attachCommunityHandlers();
+}
+
+function communityCardHTML(c) {
+    const me = getCurrentUser();
+    const isMember = c.members && me && c.members.includes(me.username);
+    const count = c.membersCount || (c.members ? c.members.length : 0);
+    return `
+        <div class="community-card" data-comm-id="${escapeAttr(c.id)}">
+            <div class="community-head">
+                <div class="community-avatar">
+                    ${c.avatar ? `<img src="${escapeAttr(c.avatar)}" alt="">` : '#'}
+                </div>
+                <div style="flex:1;min-width:0">
+                    <div class="community-title">${escapeHtml(c.title)}</div>
+                    <div class="community-meta">@${escapeHtml(c.username)}</div>
+                </div>
+            </div>
+            <div class="community-desc">${escapeHtml(c.desc)}</div>
+            <div class="community-footer">
+                <span class="community-member-badge">${count} ${plural(count, 'участник', 'участника', 'участников')}</span>
+                ${isMember ? `<span class="community-member-badge" style="color:var(--online);border-color:var(--online)">вы участник</span>` : ''}
+                <span style="margin-left:auto;color:var(--accent);font-family:var(--font-head);font-size:.72rem;letter-spacing:1px">Открыть →</span>
+            </div>
+        </div>
+    `;
+}
+
+function attachCommunityHandlers() {
+    document.querySelectorAll('.community-card').forEach(card => {
+        card.addEventListener('click', () => {
+            currentCommunityId = card.dataset.commId;
+            navigate('community', { communityId: currentCommunityId });
+        });
+    });
+}
+
+/* ---------- СООБЩЕСТВА ---------- */
+async function renderCommunitiesPage() {
+    const user = getCurrentUser();
+    if (_communitiesCache.length === 0) {
+        await loadCommunitiesCache();
+    }
+    const communities = _communitiesCache.slice().sort((a,b) => b.createdAt - a.createdAt);
+
+    app.innerHTML = `
+        <div class="container">
+            <section class="section" style="padding-top:60px">
+                <div class="section-head">
+                    <div class="section-title">Сообщества</div>
+                    ${user ? `<button class="btn btn-primary" id="newCommunityBtn">+ Создать сообщество</button>` : ''}
+                </div>
+                ${communities.length ? `<div class="communities-grid">${communities.map(communityCardHTML).join('')}</div>` : `<div class="empty">Пока нет сообществ. Создайте первое!</div>`}
+            </section>
+        </div>
+    `;
+    if (user) {
+        document.getElementById('newCommunityBtn').addEventListener('click', () => {
+            document.getElementById('newCommunityOverlay').classList.add('active');
+        });
+    }
+    attachCommunityHandlers();
+}
+
+async function renderCommunityPage() {
+    const id = navData.communityId || currentCommunityId;
+    let comm;
+    try {
+        comm = await apiGetCommunity(id);
+    } catch(e) {
+        showToast('Сообщество не найдено', 'error');
+        navigate('communities');
+        return;
+    }
+    if (!comm) { navigate('communities'); return; }
+
+    const me = getCurrentUser();
+    const isMember = await apiIsJoinedCommunity(id);
+    const isOwner = me && comm.owner === (me.id || me.username);
+    const members = await apiGetCommunityMembers(id);
+    const memberUsernames = members.map(u => u.username);
+
+    // Обновляем кэш
+    const cached = _communitiesCache.find(c => c.id === id);
+    if (cached) {
+        cached.members = memberUsernames;
+        cached.membersCount = members.length;
+    }
+
+    app.innerHTML = `
+        <div class="container">
+            <div class="community-page">
+                <button class="btn btn-ghost btn-sm" onclick="navigate('communities')" style="margin-bottom:24px">← К сообществам</button>
+                <div class="community-page-head">
+                    <div class="community-page-avatar">
+                        ${comm.avatar ? `<img src="${escapeAttr(comm.avatar)}" alt="">` : '#'}
+                    </div>
+                    <div class="community-page-info">
+                        <div class="community-page-title">${escapeHtml(comm.title)}</div>
+                        <div class="community-page-username">@${escapeHtml(comm.username)} · ${members.length} ${plural(members.length, 'участник', 'участника', 'участников')}</div>
+                        <div class="community-page-desc">${escapeHtml(comm.desc)}</div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            ${me && !isMember ? `<button class="btn btn-primary" id="joinBtn">Вступить</button>` : ''}
+                            ${isMember && !isOwner ? `<button class="btn btn-danger" id="leaveBtn">Покинуть</button>` : ''}
+                            ${isMember ? `<button class="btn" id="openChatBtn">Открыть чат</button>` : ''}
+                            ${isOwner ? `<span class="community-member-badge" style="color:var(--accent);border-color:var(--accent)">вы владелец</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="community-tabs">
+                    <button class="community-tab ${currentCommunityTab === 'chat' ? 'active' : ''}" data-ctab="chat">Чат</button>
+                    <button class="community-tab ${currentCommunityTab === 'members' ? 'active' : ''}" data-ctab="members">Участники</button>
+                    <button class="community-tab ${currentCommunityTab === 'about' ? 'active' : ''}" data-ctab="about">О сообществе</button>
+                </div>
+
+                <div id="communityContent"></div>
+            </div>
+        </div>
+    `;
+
+    const joinBtn = document.getElementById('joinBtn');
+    if (joinBtn) joinBtn.addEventListener('click', async () => {
+        try {
+            await apiJoinCommunity(id);
+            await loadCommunitiesCache();
+            showToast('Вы вступили в сообщество', 'success');
+            render();
+        } catch(e) {
+            showToast('Ошибка: ' + e.message, 'error');
+        }
+    });
+
+    const leaveBtn = document.getElementById('leaveBtn');
+    if (leaveBtn) leaveBtn.addEventListener('click', async () => {
+        if (!confirm('Покинуть сообщество?')) return;
+        try {
+            await apiLeaveCommunity(id);
+            await loadCommunitiesCache();
+            showToast('Вы покинули сообщество');
+            render();
+        } catch(e) {
+            showToast('Ошибка: ' + e.message, 'error');
+        }
+    });
+
+    const openChatBtn = document.getElementById('openChatBtn');
+    if (openChatBtn) openChatBtn.addEventListener('click', () => {
+        const chat = getOrCreateCommunityChat(id);
+        currentChatId = chat.id;
+        chatTab = 'communities';
+        navigate('messages', { chatId: chat.id });
+    });
+
+    document.querySelectorAll('.community-tab').forEach(t => {
+        t.addEventListener('click', () => {
+            currentCommunityTab = t.dataset.ctab;
+            render();
+        });
+    });
+
+    const content = document.getElementById('communityContent');
+    if (currentCommunityTab === 'chat') {
+        if (!isMember) {
+            content.innerHTML = `<div class="empty">Чат доступен только участникам. Вступите в сообщество!</div>`;
+        } else {
+            const chat = getOrCreateCommunityChat(id);
+            const msgs = getMessages(chat.id);
+            content.innerHTML = `
+                <div class="card">
+                    <div id="communityChat" style="max-height:500px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+                        ${msgs.length ? msgs.map(m => {
+                            const isMine = me && m.from === me.username;
+                            return `<div class="msg ${isMine ? 'msg-out' : 'msg-in'}">
+                                ${!isMine ? `<div class="msg-author">${escapeHtml(displayName(m.from))}</div>` : ''}
+                                ${escapeHtml(m.text)}
+                                <div class="msg-time">${formatTime(m.at)}</div>
+                            </div>`;
+                        }).join('') : '<div style="text-align:center;color:var(--text3);font-style:italic;padding:20px">Пока нет сообщений. Начните первым!</div>'}
+                    </div>
+                    <div style="display:flex;gap:10px">
+                        <textarea id="commInput" placeholder="Написать..." rows="1" style="flex:1;padding:10px 14px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;font-family:var(--font-body);font-size:.95rem;resize:none;outline:none;max-height:100px"></textarea>
+                        <button class="send-btn" id="commSendBtn">Отправить</button>
+                    </div>
+                </div>
+            `;
+            const input = document.getElementById('commInput');
+            const btn = document.getElementById('commSendBtn');
+            function send() {
+                const text = input.value.trim();
+                if (!text) return;
+                sendMessage(chat.id, me.username, text);
+                touchLastSeen(me.username);
+                input.value = '';
+                render();
+                setTimeout(() => {
+                    const box = document.getElementById('communityChat');
+                    if (box) box.scrollTop = box.scrollHeight;
+                }, 30);
+            }
+            btn.addEventListener('click', send);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+            });
+            setTimeout(() => {
+                const box = document.getElementById('communityChat');
+                if (box) box.scrollTop = box.scrollHeight;
+            }, 30);
+        }
+    } else if (currentCommunityTab === 'members') {
+        content.innerHTML = `
+            <div style="display:grid;gap:8px">
+                ${members.map(u => {
+                    const online = isUserOnline(u.username);
+                    return `
+                        <div class="user-card" data-user="${escapeAttr(u.username)}">
+                            ${avatarHTML(u, 'md')}
+                            <div class="user-card-info">
+                                <div class="user-card-name">${escapeHtml(u.displayName || u.username)} ${comm.owner === u.username || comm.owner === u.id ? '<span style="font-size:.65rem;color:var(--accent)">— владелец</span>' : ''}</div>
+                                <div class="user-card-username">@${escapeHtml(u.handle || u.username)}</div>
+                                <div class="user-card-status ${online ? 'online' : ''}">${online ? 'в сети' : 'не в сети'}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+        content.querySelectorAll('.user-card').forEach(c => {
+            c.addEventListener('click', () => {
+                currentProfileUser = c.dataset.user;
+                navigate('profile');
+            });
+        });
+    } else {
+        content.innerHTML = `
+            <div class="card" style="line-height:1.8">
+                <p style="margin-bottom:14px"><strong style="color:var(--accent);font-family:var(--font-head);letter-spacing:1px">Описание</strong></p>
+                <p style="white-space:pre-wrap;color:var(--text2)">${escapeHtml(comm.desc)}</p>
+                <p style="margin-top:20px;color:var(--text3);font-size:.85rem;font-style:italic">Создано ${formatDate(comm.createdAt)}</p>
+            </div>
+        `;
+    }
+}
+
+
+/* ====================== ВСПОМОГАТЕЛЬНОЕ ====================== */
+function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function escapeAttr(s) { return escapeHtml(s); }
+function truncate(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+function formatDate(ts) {
+    const d = new Date(ts);
+    const m = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+    return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+function formatTime(ts) {
+    const d = new Date(ts);
+    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+/* ====================== НАВИГАЦИЯ ====================== */
+document.querySelectorAll('.nav-link').forEach(l => {
+    l.addEventListener('click', () => navigate(l.dataset.page));
+});
+document.getElementById('brandBtn').addEventListener('click', () => navigate('home'));
+
+setInterval(() => {
+    const user = getCurrentUser();
+    if (user) touchLastSeen(user.username);
+    renderTopbarUser();
+    if (document.getElementById('usersPanel').classList.contains('open')) renderUsersPanel();
+    if (document.getElementById('friendsPanel').classList.contains('open')) renderFriendsPanel();
+    if (getCurrentUser()) updateUnreadBadge();
+}, 30000);
+
+/* Esc закрывает модалки */
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        ['authOverlay','googleOverlay','rulesOverlay','editProfileOverlay','newCommunityOverlay','logoutOverlay','deleteAccountOverlay'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('active');
+        });
+    }
+});
+
+/* ====================== СТАРТ ====================== */
+(async function start() {
+    await loadCurrentUser();
+    if (_currentUser) {
+        await Promise.all([
+            loadBooks(),
+            loadUsersCache(),
+            loadFriendsData(),
+        ]);
+    }
+    await render();
+    updateUnreadBadge();
+    updateBookCounter();
+})();
+</script>
+</body>
+</html>

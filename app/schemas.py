@@ -124,6 +124,20 @@ class MessageOut(BaseModel):
     createdAt: datetime
 
 
+class ChatOut(BaseModel):
+    chatId: str
+    type: str
+    title: str
+    otherUserId: str | None = None
+    lastMessage: str | None = None
+    lastMessageAt: datetime | None = None
+    unreadCount: int = 0
+
+
+class HeartbeatOut(BaseModel):
+    ok: bool = True
+
+
 # ---------- Reviews ----------
 class ReviewIn(BaseModel):
     rating: int = Field(ge=1, le=5)

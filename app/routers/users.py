@@ -1,8 +1,9 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User, Book
-from app.schemas import UserOut, UpdateProfileIn, BookOut
+from app.schemas import UserOut, UpdateProfileIn, BookOut, HeartbeatOut
 from app.deps import get_current_user, get_current_user_optional
 
 router = APIRouter(prefix="/api/users", tags=["users"])
@@ -12,6 +13,7 @@ def user_out(u: User) -> UserOut:
     return UserOut(
         id=u.id, username=u.username, email=u.email,
         displayName=u.display_name, bio=u.bio, avatarUrl=u.avatar_url,
+        lastSeen=u.last_seen,
     )
 
 
@@ -28,6 +30,16 @@ def list_users(
             User.username.ilike(like) | User.display_name.ilike(like)
         )
     return [user_out(u) for u in query.limit(200).all()]
+
+
+@router.post("/heartbeat", response_model=HeartbeatOut)
+def heartbeat(
+    me: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    me.last_seen = datetime.utcnow()
+    db.commit()
+    return HeartbeatOut(ok=True)
 
 
 @router.get("/{user_id}", response_model=UserOut)

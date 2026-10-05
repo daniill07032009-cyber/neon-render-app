@@ -2500,15 +2500,6 @@ function friendCardHTML(user, mode) {
     `;
 }
 
-function getFriendStatus(me, other) {
-    if (!me || me === other) return 'none';
-    const data = getFriendsData(me);
-    if (data.friends.includes(other)) return 'friends';
-    if (data.outgoing.includes(other)) return 'outgoing';
-    if (data.incoming.includes(other)) return 'incoming';
-    return 'none';
-}
-
 function attachUserCardHandlers(container) {
     container.querySelectorAll('.user-card').forEach(card => {
         const username = card.dataset.user;
@@ -2673,14 +2664,14 @@ function renderFriendsPanel() {
             const targetUser = _usersCache[target];
             const targetId = targetUser ? targetUser.id : target;
 
-            if (action === 'write') {
-                const chat = getOrCreateDM(me2.username, target);
-                currentChatId = chat.id;
-                chatTab = 'dialogs';
-                closeAllPanels();
-                navigate('messages', { chatId: chat.id });
-                return;
-            }
+    if (action === 'write') {
+        const chat = await getOrCreateDM(me.username, target);
+        currentChatId = chat.id;
+        chatTab = 'dialogs';
+        closeAllPanels();
+        navigate('messages', { chatId: chat.id });
+        return;
+    }
 
             try {
                 if (action === 'accept') {
@@ -3293,13 +3284,12 @@ if (restartBtn) restartBtn.addEventListener('click', async () => {
     }
     if (user && !isOwner) {
         const btn = document.getElementById('writeAuthorBtn');
-        if (btn) btn.addEventListener('click', () => {
-            const chat = getOrCreateDM(user.username, book.author);
+        if (btn) btn.addEventListener('click', async () => {
+            const chat = await getOrCreateDM(user.username, book.author);
             currentChatId = chat.id;
             navigate('messages', { chatId: chat.id });
         });
     }
-}
 
 /* ---------- ЧИТАЛКА ---------- */
 async function renderReader() {
@@ -4111,10 +4101,10 @@ try {
     });
     const writeBtn = document.getElementById('writeBtn');
     if (writeBtn) writeBtn.addEventListener('click', async () => {
-    const chat = await getOrCreateDM(me.username, username);
-    currentChatId = chat.id;
-    navigate('messages', { chatId: chat.id });
-});
+        const chat = await getOrCreateDM(me.username, username);
+        currentChatId = chat.id;
+        navigate('messages', { chatId: chat.id });
+    });
 
     attachBookClickHandlers();
     attachCommunityHandlers();

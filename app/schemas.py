@@ -23,6 +23,7 @@ class UserOut(BaseModel):
     displayName: str
     bio: str = ""
     avatarUrl: str | None = None
+    lastSeen: datetime | None = None
 
 
 class UpdateProfileIn(BaseModel):

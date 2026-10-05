@@ -22,6 +22,7 @@ class User(Base):
     bio: Mapped[str] = mapped_column(Text, default="")
     avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    last_seen: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, default=None, index=True)
 
     books: Mapped[list["Book"]] = relationship(back_populates="author", cascade="all, delete-orphan")
 

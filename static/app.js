@@ -198,10 +198,15 @@ function normalizeBookWithChapters(b) {
 function normalizeUser(u) {
     if (!u) return null;
     return {
-        username: u.username, id: u.id, handle: u.username,
+        username: u.username,
+        id: u.id,
+        handle: u.username,
         displayName: u.displayName || u.username,
-        email: u.email || null, bio: u.bio || '',
-        avatar: u.avatarUrl || null, google: false,
+        email: u.email || null,
+        bio: u.bio || '',
+        avatar: u.avatarUrl || null,
+        lastSeen: u.lastSeen || null,
+        google: false,
     };
 }
 
@@ -287,8 +292,13 @@ async function loadUsersCache() {
         _usersCache = {};
         users.forEach(u => {
             _usersCache[u.username] = {
-                handle: u.username, email: u.email, displayName: u.displayName,
-                bio: u.bio, avatar: u.avatar, id: u.id,
+                handle: u.username,
+                email: u.email,
+                displayName: u.displayName,
+                bio: u.bio,
+                avatar: u.avatar,
+                id: u.id,
+                lastSeen: u.lastSeen || null,
             };
         });
     } catch(e) { console.error('Ошибка загрузки пользователей:', e); }
@@ -423,18 +433,23 @@ function getUserReadingList(username) {
         .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
-/* ====================== ОНЛАЙН-СТАТУС ====================== */
-function getLastSeen() { return load(KEYS.lastSeen, {}); }
-function saveLastSeen(ls) { save(KEYS.lastSeen, ls); }
-function touchLastSeen(username) {
-    const ls = getLastSeen();
-    ls[username] = Date.now();
-    saveLastSeen(ls);
-}
+/* ====================== ОНЛАЙН-СТАТУС (через сервер) ====================== */
 function isUserOnline(username) {
-    const ls = getLastSeen();
-    if (!ls[username]) return false;
-    return Date.now() - ls[username] < 2 * 60 * 1000;
+    // Сначала смотрим в кэш пользователей (там lastSeen с сервера)
+    const cached = _usersCache[username];
+    if (cached && cached.lastSeen) {
+        const t = new Date(cached.lastSeen).getTime();
+        return Date.now() - t < 2 * 60 * 1000;
+    }
+    // Если это текущий пользователь — считаем его онлайн
+    const me = getCurrentUser();
+    if (me && me.username === username) return true;
+    return false;
+}
+function getLastSeenTime(username) {
+    const cached = _usersCache[username];
+    if (cached && cached.lastSeen) return new Date(cached.lastSeen).getTime();
+    return 0;
 }
 function getOnlineCount() {
     const users = getUsers();
@@ -2595,14 +2610,20 @@ function initGlobalListeners() {
 
     initGlobalSearch();
 
-    setInterval(() => {
-        const user = getCurrentUser();
-        if (user) touchLastSeen(user.username);
-        renderTopbarUser();
-        if (document.getElementById('usersPanel').classList.contains('open')) renderUsersPanel();
-        if (document.getElementById('friendsPanel').classList.contains('open')) renderFriendsPanel();
-        if (getCurrentUser()) updateUnreadBadge();
-    }, 30000);
+setInterval(async () => {
+    const user = getCurrentUser();
+    if (user) {
+        // Пингуем сервер — обновляем last_seen и подтягиваем свежие данные
+        try {
+            await api('/api/users/heartbeat', { method: 'POST' });
+            await loadUsersCache();
+        } catch(e) {}
+    }
+    renderTopbarUser();
+    if (document.getElementById('usersPanel').classList.contains('open')) renderUsersPanel();
+    if (document.getElementById('friendsPanel').classList.contains('open')) renderFriendsPanel();
+    if (getCurrentUser()) updateUnreadBadge();
+}, 30000);
 }
 
 /* ====================== СТАРТ ====================== */
